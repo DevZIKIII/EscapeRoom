@@ -11,3 +11,4 @@ export const rooms = [
     description: 'Teste seus conhecimentos em estruturas de dados.'
   }
 ];
+export default rooms;

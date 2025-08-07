@@ -1,3 +1,5 @@
+import rooms from './rooms.js';
+
 class EscapeRoomGame {
     constructor() {
         this.player = {
@@ -5,21 +7,21 @@ class EscapeRoomGame {
             y: 40,
             element: document.getElementById('player')
         };
-        
-        this.currentRoom = 1;
-        this.maxRooms = 3;
+
+        this.currentRoom = 1; // Sala inicial
+        this.maxRooms = rooms.length; // Número total de salas baseado no rooms.js
+        this.foundDigits = 0; // Dígitos encontrados
+        this.passwordLength = 5; // Comprimento da senha
         this.score = 0;
         this.timeLeft = 600; // 10 minutos
         this.gameRunning = true;
         this.roomData = {};
         this.currentPassword = [];
-        this.passwordLength = 5;
-        this.foundDigits = 0;
         this.newsItems = [];
-        
+
         this.canvas = document.getElementById('game-canvas');
         this.door = document.getElementById('door');
-        
+
         this.keys = {
             left: false,
             right: false,
@@ -213,8 +215,17 @@ class EscapeRoomGame {
             Math.pow(this.player.y - (this.canvas.offsetHeight / 2), 2)
         );
         
-        if (doorDistance < 40 && this.foundDigits === this.passwordLength) {
-            this.tryOpenDoor();
+        if (doorDistance < 40) {
+            if (this.foundDigits === this.passwordLength) {
+                // Verifique explicitamente se o jogador está na última sala
+                if (this.currentRoom < this.maxRooms) {
+                    this.nextRoom(); // Avance para a próxima sala
+                } else {
+                    this.winGame(); // Finalize o jogo
+                }
+            } else {
+                this.showFeedback('Você precisa descobrir todos os números da senha primeiro!', 'incorrect');
+            }
         }
     }
     
@@ -280,12 +291,30 @@ class EscapeRoomGame {
     
     nextRoom() {
         this.currentRoom++;
+
+        // Verifique se o jogador está na última sala
+        if (this.currentRoom > this.maxRooms) {
+            this.winGame();
+            return;
+        }
+
+        // Reposicione o jogador no canto esquerdo da sala
+        this.player.x = 40; // Posição inicial no eixo X
+        this.player.y = 40; // Posição inicial no eixo Y
+        this.updatePlayerPosition();
+
         this.door.classList.remove('unlocked');
         this.showFeedback(`Parabéns! Você passou para a Sala ${this.currentRoom}!`, 'correct');
         
         setTimeout(() => {
             this.initializeRoom();
         }, 2000);
+    }
+
+    updatePlayerPosition() {
+        // Atualize a posição do elemento do jogador no DOM
+        this.player.element.style.left = `${this.player.x}px`;
+        this.player.element.style.top = `${this.player.y}px`;
     }
     
     winGame() {
@@ -382,9 +411,32 @@ class EscapeRoomGame {
         if (this.gameRunning) {
             this.updatePlayer();
             this.checkCollisions();
+            this.handlePlayerCollisionWithDoor();
         }
         
         requestAnimationFrame(() => this.gameLoop());
+    }
+
+    handlePlayerCollisionWithDoor() {
+        // Verifique se o jogador encontrou a porta
+        if (this.isPlayerCollidingWithDoor()) {
+            // Em vez de chamar winGame() diretamente, chame tryOpenDoor()
+            this.tryOpenDoor();
+        }
+    }
+
+    isPlayerCollidingWithDoor() {
+        // Lógica para verificar se o jogador está colidindo com a porta
+        // Retorne true se houver colisão, false caso contrário
+        // Exemplo básico:
+        const playerBounds = this.player.element.getBoundingClientRect();
+        const doorBounds = this.door.getBoundingClientRect();
+        return (
+            playerBounds.right > doorBounds.left &&
+            playerBounds.left < doorBounds.right &&
+            playerBounds.bottom > doorBounds.top &&
+            playerBounds.top < doorBounds.bottom
+        );
     }
 }
 
