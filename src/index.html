@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room - Caçador de Fake News</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="game-root">
+        <h1>�️ Escape Room - Caçador de Fake News</h1>
+        <div id="game-stats">
+            <div id="score">Pontos: 0</div>
+            <div id="timer">Tempo: 10:00</div>
+            <div id="room-info">Sala 1</div>
+        </div>
+        <div class="password-display">
+            <p>Senha da Porta:</p>
+            <div id="password-digits">_ _ _ _ _</div>
+            <p id="password-hint">Encontre notícias e responda corretamente para descobrir os números!</p>
+        </div>
+        <div id="game-canvas">
+            <div id="player"></div>
+            <div id="news-items"></div>
+            <div class="door" id="door"></div>
+        </div>
+        <div id="modal" class="modal hidden">
+            <div class="modal-content">
+                <h3 id="modal-title">Notícia Encontrada!</h3>
+                <p id="modal-news"></p>
+                <div class="modal-buttons">
+                    <button id="fake-btn" class="btn fake">🚫 Fake News</button>
+                    <button id="real-btn" class="btn real">✅ Notícia Real</button>
+                </div>
+            </div>
+        </div>
+        <div id="instructions">
+            <p>Use as setas ⬅️➡️⬆️⬇️ para mover o bonequinho e encontre as notícias!</p>
+        </div>
+    </div>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

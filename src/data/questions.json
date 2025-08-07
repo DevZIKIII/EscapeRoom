@@ -1,0 +1,113 @@
+{
+  "room1": [
+    {
+      "id": 1,
+      "text": "Segundo estudo da Fiocruz, o Brasil desenvolveu uma vacina 100% eficaz contra todas as variantes do coronavírus e será distribuída gratuitamente na próxima semana.",
+      "isFake": true,
+      "digit": 7,
+      "explanation": "FAKE NEWS! Não existe vacina 100% eficaz contra todas as variantes. Desenvolvimento de vacinas leva anos e passa por rigorosos testes clínicos."
+    },
+    {
+      "id": 2,
+      "text": "O Ministério da Saúde recomenda o distanciamento social de pelo menos 1 metro em locais com aglomeração durante surtos de doenças respiratórias.",
+      "isFake": false,
+      "digit": 3,
+      "explanation": "VERDADEIRO! O distanciamento social é uma medida preventiva reconhecida pela OMS e órgãos de saúde mundiais."
+    },
+    {
+      "id": 3,
+      "text": "Pesquisa comprova que beber chá de boldo com açúcar cristal elimina 95% dos vírus presentes no organismo em apenas 6 horas.",
+      "isFake": true,
+      "digit": 8,
+      "explanation": "FAKE NEWS! Nenhum chá ou remédio caseiro possui eficácia comprovada cientificamente para eliminar vírus do organismo."
+    },
+    {
+      "id": 4,
+      "text": "ANVISA aprova uso emergencial de medicamento após estudos clínicos fase 3 demonstrarem segurança e eficácia em pacientes.",
+      "isFake": false,
+      "digit": 1,
+      "explanation": "VERDADEIRO! A ANVISA segue protocolos internacionais rigorosos, incluindo estudos fase 3, antes de aprovar medicamentos."
+    },
+    {
+      "id": 5,
+      "text": "Cientistas descobrem que usar máscaras por mais de 2 horas causa intoxicação por CO2 e pode levar à morte por asfixia.",
+      "isFake": true,
+      "digit": 5,
+      "explanation": "FAKE NEWS! Máscaras não causam intoxicação por CO2. Esta informação foi desmentida por diversos estudos médicos."
+    }
+  ],
+  "room2": [
+    {
+      "id": 6,
+      "text": "Governo federal anuncia programa que distribuirá R$ 10.000 para cada família via PIX, bastando clicar em link enviado por WhatsApp.",
+      "isFake": true,
+      "digit": 2,
+      "explanation": "FAKE NEWS! O governo nunca distribui dinheiro via links de WhatsApp. Sempre verifique informações em canais oficiais."
+    },
+    {
+      "id": 7,
+      "text": "IBGE divulga que taxa de desemprego no Brasil foi de 9,1% no último trimestre, segundo Pesquisa Nacional por Amostra de Domicílios.",
+      "isFake": false,
+      "digit": 9,
+      "explanation": "VERDADEIRO! O IBGE regularmente divulga dados oficiais sobre emprego através da PNAD Contínua."
+    },
+    {
+      "id": 8,
+      "text": "Estudo revela que comer alho cru com mel todos os dias aumenta a imunidade em 300% e previne qualquer tipo de câncer.",
+      "isFake": true,
+      "digit": 4,
+      "explanation": "FAKE NEWS! Nenhum alimento sozinho previne câncer ou aumenta drasticamente a imunidade. Desconfie de percentuais exatos irreais."
+    },
+    {
+      "id": 9,
+      "text": "Banco Central do Brasil mantém taxa Selic em 13,75% ao ano na última reunião do Comitê de Política Monetária (COPOM).",
+      "isFake": false,
+      "digit": 6,
+      "explanation": "VERDADEIRO! O COPOM se reúne periodicamente para definir a taxa Selic, e suas decisões são amplamente divulgadas."
+    },
+    {
+      "id": 10,
+      "text": "Médicos descobrem que tomar banho gelado pela manhã cura depressão em 90% dos casos em apenas 15 dias de tratamento.",
+      "isFake": true,
+      "digit": 0,
+      "explanation": "FAKE NEWS! Depressão é uma doença complexa que requer tratamento médico especializado. Banhos frios não são cura para transtornos mentais."
+    }
+  ],
+  "room3": [
+    {
+      "id": 11,
+      "text": "Universidade de Harvard publica estudo comprovando que 5G causa mutações genéticas e foi desenvolvido para controle mental da população.",
+      "isFake": true,
+      "digit": 7,
+      "explanation": "FAKE NEWS! Não há evidências científicas de que 5G cause mutações ou seja usado para controle mental. Estas são teorias conspiratórias."
+    },
+    {
+      "id": 12,
+      "text": "Ministério da Educação anuncia investimento de R$ 5,2 bilhões em infraestrutura de escolas públicas para o próximo ano letivo.",
+      "isFake": false,
+      "digit": 2,
+      "explanation": "VERDADEIRO! Investimentos em educação são regularmente anunciados pelo MEC através de programas oficiais."
+    },
+    {
+      "id": 13,
+      "text": "Cientistas comprovam que água com limão e bicarbonato de sódio alcaliniza o sangue, curando diabetes tipo 2 em 30 dias.",
+      "isFake": true,
+      "digit": 8,
+      "explanation": "FAKE NEWS! O pH do sangue é regulado naturalmente pelo corpo. Diabetes requer tratamento médico, não receitas caseiras."
+    },
+    {
+      "id": 14,
+      "text": "OMS declara que lavagem adequada das mãos reduz em até 40% a transmissão de doenças infecciosas.",
+      "isFake": false,
+      "digit": 1,
+      "explanation": "VERDADEIRO! A higienização das mãos é uma das medidas mais eficazes de prevenção segundo estudos da OMS."
+    },
+    {
+      "id": 15,
+      "text": "Pesquisa secreta revela que todas as vacinas contêm chips nanométricos para rastreamento populacional desenvolvidos por empresas de tecnologia.",
+      "isFake": true,
+      "digit": 9,
+      "explanation": "FAKE NEWS! Esta é uma teoria conspiratória sem base científica. Vacinas passam por rigoroso controle de qualidade e seus ingredientes são públicos."
+    }
+  ]
+}
