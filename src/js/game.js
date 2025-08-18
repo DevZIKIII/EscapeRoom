@@ -5,20 +5,22 @@ class EscapeRoomGame {
         this.player = {
             x: 40,
             y: 40,
-            element: document.getElementById('player')
+            element: document.getElementById('player'),
         };
 
-        this.currentRoom = 1; // Sala inicial
-        this.maxRooms = rooms.length; // Número total de salas baseado no rooms.js
-        this.foundDigits = 0; // Dígitos encontrados
-        this.passwordLength = 5; // Comprimento da senha
+        this.currentRoom = 1;
+        this.maxRooms = rooms.length;
+        this.foundDigits = 0;
+        this.passwordLength = 5;
         this.score = 0;
-        this.timeLeft = 600; // 10 minutos
+        this.timeLeft = 600;
         this.gameRunning = true;
         this.roomData = {};
         this.currentPassword = [];
         this.newsItems = [];
 
+        // CORREÇÃO 1: Usando o seletor correto para o ID 'room-title'
+        this.h1Title = document.getElementById('room-title');
         this.canvas = document.getElementById('game-canvas');
         this.door = document.getElementById('door');
 
@@ -28,10 +30,10 @@ class EscapeRoomGame {
             up: false,
             down: false
         };
-        
+
         this.init();
     }
-    
+
     async init() {
         await this.loadRoomData();
         this.setupEventListeners();
@@ -39,7 +41,7 @@ class EscapeRoomGame {
         this.startTimer();
         this.gameLoop();
     }
-    
+
     async loadRoomData() {
         try {
             const response = await fetch('data/questions.json');
@@ -48,279 +50,240 @@ class EscapeRoomGame {
             console.error('Erro ao carregar dados das salas:', error);
         }
     }
-    
+
+    // CORREÇÃO 2: Mantida a versão correta da função e removida a duplicada
+    updateRoomInfo() {
+        const currentRoomData = rooms.find(room => room.id === this.currentRoom);
+        const roomName = currentRoomData ? currentRoomData.name : `Sala ${this.currentRoom}`;
+
+        // Atualiza o título H1 e a informação da sala
+        if (this.h1Title) {
+            this.h1Title.textContent = `Escape Room - ${roomName}`;
+        }
+        document.getElementById('room-info').textContent = roomName;
+    }
+
     initializeRoom() {
         this.currentPassword = Array(this.passwordLength).fill('_');
         this.foundDigits = 0;
         this.updatePasswordDisplay();
-        this.spawnNewsItems();
+        this.spawnNewsItems(); // Esta função agora existe
         this.updateRoomInfo();
         this.resetPlayerPosition();
     }
-    
+
     resetPlayerPosition() {
         this.player.x = 40;
         this.player.y = 40;
         this.player.element.style.left = this.player.x + 'px';
         this.player.element.style.top = this.player.y + 'px';
     }
-    
+
     setupEventListeners() {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('keyup', (e) => this.handleKeyUp(e));
-        
+
         document.getElementById('fake-btn').addEventListener('click', () => this.answerQuestion(true));
         document.getElementById('real-btn').addEventListener('click', () => this.answerQuestion(false));
-        
+
         this.door.addEventListener('click', () => this.tryOpenDoor());
     }
-    
+
     handleKeyDown(e) {
-        switch(e.key) {
-            case 'ArrowLeft':
-                this.keys.left = true;
-                e.preventDefault();
-                break;
-            case 'ArrowRight':
-                this.keys.right = true;
-                e.preventDefault();
-                break;
-            case 'ArrowUp':
-                this.keys.up = true;
-                e.preventDefault();
-                break;
-            case 'ArrowDown':
-                this.keys.down = true;
-                e.preventDefault();
-                break;
+        switch (e.key) {
+            case 'ArrowLeft': this.keys.left = true; e.preventDefault(); break;
+            case 'ArrowRight': this.keys.right = true; e.preventDefault(); break;
+            case 'ArrowUp': this.keys.up = true; e.preventDefault(); break;
+            case 'ArrowDown': this.keys.down = true; e.preventDefault(); break;
         }
     }
-    
+
     handleKeyUp(e) {
-        switch(e.key) {
-            case 'ArrowLeft':
-                this.keys.left = false;
-                break;
-            case 'ArrowRight':
-                this.keys.right = false;
-                break;
-            case 'ArrowUp':
-                this.keys.up = false;
-                break;
-            case 'ArrowDown':
-                this.keys.down = false;
-                break;
+        switch (e.key) {
+            case 'ArrowLeft': this.keys.left = false; break;
+            case 'ArrowRight': this.keys.right = false; break;
+            case 'ArrowUp': this.keys.up = false; break;
+            case 'ArrowDown': this.keys.down = false; break;
         }
     }
-    
+
     updatePlayer() {
-        const speed = 4; // Aumentei a velocidade
+        const speed = 4;
         let moved = false;
-        
-        // Movimento mais suave e responsivo
-        if (this.keys.left && this.player.x > 5) {
-            this.player.x -= speed;
-            moved = true;
-        }
-        if (this.keys.right && this.player.x < this.canvas.offsetWidth - 85) { // Ajustei para o novo tamanho
-            this.player.x += speed;
-            moved = true;
-        }
-        if (this.keys.up && this.player.y > 5) {
-            this.player.y -= speed;
-            moved = true;
-        }
-        if (this.keys.down && this.player.y < this.canvas.offsetHeight - 45) { // Ajustei para o novo tamanho
-            this.player.y += speed;
-            moved = true;
-        }
-        
-        // Atualizar posição imediatamente, sem transição CSS
+
+        if (this.keys.left && this.player.x > 5) { this.player.x -= speed; moved = true; }
+        if (this.keys.right && this.player.x < this.canvas.offsetWidth - 85) { this.player.x += speed; moved = true; }
+        if (this.keys.up && this.player.y > 5) { this.player.y -= speed; moved = true; }
+        if (this.keys.down && this.player.y < this.canvas.offsetHeight - 45) { this.player.y += speed; moved = true; }
+
         if (moved) {
             this.player.element.style.left = this.player.x + 'px';
             this.player.element.style.top = this.player.y + 'px';
         }
     }
-    
+
+    // CORREÇÃO 3: Função que faltava foi adicionada
     spawnNewsItems() {
         const container = document.getElementById('news-items');
-        container.innerHTML = '';
+        container.innerHTML = ''; // Limpa itens antigos
         this.newsItems = [];
-        
-        const roomKey = `room${this.currentRoom}`;
-        const roomQuestions = this.roomData[roomKey];
-        
-        if (!roomQuestions) return;
-        
-        // Embaralhar as perguntas e pegar apenas 5
-        const shuffled = [...roomQuestions].sort(() => Math.random() - 0.5).slice(0, 5);
-        
-        shuffled.forEach((question, index) => {
-            this.spawnNewsItem(question, index);
-        });
+
+        const roomQuestions = this.roomData[`room${this.currentRoom}`];
+        if (roomQuestions) {
+            roomQuestions.forEach((question, index) => {
+                this.spawnNewsItem(question, index);
+            });
+        }
     }
     
     spawnNewsItem(questionData, index) {
         const container = document.getElementById('news-items');
         const newsItem = document.createElement('div');
         newsItem.className = 'news-item';
-        
-        // Posições otimizadas para tela menor
-        const positions = [
-            { x: 80, y: 60 },
-            { x: 250, y: 100 },
-            { x: 120, y: 200 },
-            { x: 350, y: 180 },
-            { x: 200, y: 280 }
-        ];
-        
-        const pos = positions[index] || { 
-            x: 60 + Math.random() * (this.canvas.offsetWidth - 140), 
-            y: 40 + Math.random() * (this.canvas.offsetHeight - 80) 
+
+        // Lógica de spawn aleatório em PORCENTAGEM para TODOS os itens
+        // Gera um valor entre 10% e 90% para não nascer colado nas bordas
+        const pos = {
+            x: 10 + Math.random() * 60,
+            y: 10 + Math.random() * 70
         };
-        
-        newsItem.style.left = pos.x + 'px';
-        newsItem.style.top = pos.y + 'px';
+
+        // Aplica o estilo usando a unidade de porcentagem '%'
+        newsItem.style.left = pos.x + '%';
+        newsItem.style.top = pos.y + '%';
         newsItem.dataset.questionId = questionData.id;
-        
+
         container.appendChild(newsItem);
-        
+
+        // Armazena a posição em porcentagem para o cálculo de colisão
         this.newsItems.push({
             element: newsItem,
-            x: pos.x,
-            y: pos.y,
+            xPercent: pos.x,
+            yPercent: pos.y,
             questionData: questionData,
             collected: false
         });
     }
-    
+
     checkCollisions() {
         this.newsItems.forEach((item, index) => {
             if (item.collected) return;
-            
-            // Distância de colisão otimizada
+
+            // Dimensões dos elementos (do CSS)
+            const playerWidth = 35;
+            const playerHeight = 35;
+            const itemWidth = 25;
+            const itemHeight = 25;
+
+            // Calcula a posição do item em pixels no momento da colisão
+            const itemPixelX = (item.xPercent / 100) * this.canvas.offsetWidth;
+            const itemPixelY = (item.yPercent / 100) * this.canvas.offsetHeight;
+
+            // Calcula a coordenada do CENTRO do jogador
+            const playerCenterX = this.player.x + playerWidth / 2;
+            const playerCenterY = this.player.y + playerHeight / 2;
+
+            // Calcula a coordenada do CENTRO do item de notícia
+            const itemCenterX = itemPixelX + itemWidth / 2;
+            const itemCenterY = itemPixelY + itemHeight / 2;
+
+            // Calcula a distância entre os dois PONTOS CENTRAIS
             const distance = Math.sqrt(
-                Math.pow(this.player.x - item.x, 2) + 
-                Math.pow(this.player.y - item.y, 2)
+                Math.pow(playerCenterX - itemCenterX, 2) +
+                Math.pow(playerCenterY - itemCenterY, 2)
             );
-            
-            if (distance < 30) { // Distância menor para colisão mais precisa
+
+            // Define a distância mínima para colisão (soma dos raios dos dois objetos)
+            const collisionThreshold = (playerWidth / 2) + (itemWidth / 2); // Aprox. 30
+
+            if (distance < collisionThreshold) {
                 this.showNewsModal(item.questionData, index);
             }
         });
-        
-        // Verificar colisão com a porta (ajustado para novo tamanho)
-        const doorDistance = Math.sqrt(
-            Math.pow(this.player.x - (this.canvas.offsetWidth - 60), 2) + 
-            Math.pow(this.player.y - (this.canvas.offsetHeight / 2), 2)
-        );
-        
-        if (doorDistance < 40) {
-            if (this.foundDigits === this.passwordLength) {
-                // Verifique explicitamente se o jogador está na última sala
-                if (this.currentRoom < this.maxRooms) {
-                    this.nextRoom(); // Avance para a próxima sala
-                } else {
-                    this.winGame(); // Finalize o jogo
-                }
-            } else {
-                this.showFeedback('Você precisa descobrir todos os números da senha primeiro!', 'incorrect');
-            }
-        }
     }
-    
+
+
     showNewsModal(questionData, itemIndex) {
         this.currentQuestionIndex = itemIndex;
         document.getElementById('modal-news').textContent = questionData.text;
         document.getElementById('modal').classList.remove('hidden');
         this.gameRunning = false;
     }
-    
+
     answerQuestion(userSaysFake) {
         const item = this.newsItems[this.currentQuestionIndex];
         const questionData = item.questionData;
         const isCorrect = userSaysFake === questionData.isFake;
-        
+
         if (isCorrect) {
             this.score += 10;
             this.addDigitToPassword(questionData.digit);
             this.showFeedback(`Correto! +10 pontos. Número ${questionData.digit} adicionado à senha!`, 'correct');
-            
-            // Remover o item coletado
             item.element.remove();
             item.collected = true;
-            
         } else {
             this.showFeedback(questionData.explanation, 'incorrect');
         }
-        
+
         this.updateUI();
         document.getElementById('modal').classList.add('hidden');
         this.gameRunning = true;
     }
-    
+
     addDigitToPassword(digit) {
         if (this.foundDigits < this.passwordLength) {
             this.currentPassword[this.foundDigits] = digit;
             this.foundDigits++;
             this.updatePasswordDisplay();
-            
+
             if (this.foundDigits === this.passwordLength) {
                 this.door.classList.add('unlocked');
                 document.getElementById('password-hint').textContent = 'Senha completa! Vá até a porta para avançar!';
             }
         }
     }
-    
+
     updatePasswordDisplay() {
-        const display = document.getElementById('password-digits');
-        display.textContent = this.currentPassword.join(' ');
+        document.getElementById('password-digits').textContent = this.currentPassword.join(' ');
     }
-    
+
     tryOpenDoor() {
-        if (this.foundDigits === this.passwordLength) {
+        if (this.isPlayerCollidingWithDoor() && this.foundDigits === this.passwordLength) {
             if (this.currentRoom < this.maxRooms) {
                 this.nextRoom();
             } else {
                 this.winGame();
             }
-        } else {
+        } else if (this.isPlayerCollidingWithDoor()) {
             this.showFeedback('Você precisa descobrir todos os números da senha primeiro!', 'incorrect');
         }
     }
-    
+
     nextRoom() {
+        // CORREÇÃO: Mover o jogador e resetar a senha IMEDIATAMENTE
+        // Isso evita que o jogo entre em um loop de passar de fase.
+        this.resetPlayerPosition();
+        this.foundDigits = 0; // Essencial para invalidar a condição da porta na próxima checagem
+
         this.currentRoom++;
 
-        // Verifique se o jogador está na última sala
         if (this.currentRoom > this.maxRooms) {
             this.winGame();
             return;
         }
-
-        // Reposicione o jogador no canto esquerdo da sala
-        this.player.x = 40; // Posição inicial no eixo X
-        this.player.y = 40; // Posição inicial no eixo Y
-        this.updatePlayerPosition();
-
+        
         this.door.classList.remove('unlocked');
         this.showFeedback(`Parabéns! Você passou para a Sala ${this.currentRoom}!`, 'correct');
-        
+
+        // O resto da inicialização da sala pode acontecer após o atraso
         setTimeout(() => {
             this.initializeRoom();
-        }, 2000);
+        }, 1500);
     }
 
-    updatePlayerPosition() {
-        // Atualize a posição do elemento do jogador no DOM
-        this.player.element.style.left = `${this.player.x}px`;
-        this.player.element.style.top = `${this.player.y}px`;
-    }
-    
     winGame() {
         this.gameRunning = false;
         clearInterval(this.timerInterval);
-        
         const gameWin = document.createElement('div');
         gameWin.className = 'game-over';
         gameWin.innerHTML = `
@@ -331,11 +294,11 @@ class EscapeRoomGame {
             <p>Você é um verdadeiro detetive de fake news!</p>
             <button class="restart-btn" onclick="location.reload()">Jogar Novamente</button>
         `;
-        
         document.body.appendChild(gameWin);
     }
-    
+
     showFeedback(message, type) {
+        // ... (seu código de feedback, sem alterações)
         const feedback = document.createElement('div');
         feedback.className = `feedback ${type}`;
         feedback.style.position = 'fixed';
@@ -365,35 +328,25 @@ class EscapeRoomGame {
             }
         }, 4000);
     }
-    
+
     updateUI() {
         document.getElementById('score').textContent = `Pontos: ${this.score}`;
     }
-    
-    updateRoomInfo() {
-        document.getElementById('room-info').textContent = `Sala ${this.currentRoom}`;
-    }
-    
+
     startTimer() {
         this.timerInterval = setInterval(() => {
+            if (!this.gameRunning) return;
             this.timeLeft--;
-            
             const minutes = Math.floor(this.timeLeft / 60);
             const seconds = this.timeLeft % 60;
-            
-            document.getElementById('timer').textContent = 
-                `Tempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (this.timeLeft <= 0) {
-                this.endGame('Tempo esgotado!');
-            }
+            document.getElementById('timer').textContent = `Tempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (this.timeLeft <= 0) this.endGame('Tempo esgotado!');
         }, 1000);
     }
-    
+
     endGame(reason) {
         this.gameRunning = false;
         clearInterval(this.timerInterval);
-        
         const gameOver = document.createElement('div');
         gameOver.className = 'game-over';
         gameOver.innerHTML = `
@@ -403,40 +356,25 @@ class EscapeRoomGame {
             <p>Chegou até a Sala ${this.currentRoom}</p>
             <button class="restart-btn" onclick="location.reload()">Tentar Novamente</button>
         `;
-        
         document.body.appendChild(gameOver);
     }
     
+    isPlayerCollidingWithDoor() {
+        const playerBounds = this.player.element.getBoundingClientRect();
+        const doorBounds = this.door.getBoundingClientRect();
+        return (
+            playerBounds.right > doorBounds.left && playerBounds.left < doorBounds.right &&
+            playerBounds.bottom > doorBounds.top && playerBounds.top < doorBounds.bottom
+        );
+    }
+
     gameLoop() {
         if (this.gameRunning) {
             this.updatePlayer();
             this.checkCollisions();
-            this.handlePlayerCollisionWithDoor();
-        }
-        
-        requestAnimationFrame(() => this.gameLoop());
-    }
-
-    handlePlayerCollisionWithDoor() {
-        // Verifique se o jogador encontrou a porta
-        if (this.isPlayerCollidingWithDoor()) {
-            // Em vez de chamar winGame() diretamente, chame tryOpenDoor()
             this.tryOpenDoor();
         }
-    }
-
-    isPlayerCollidingWithDoor() {
-        // Lógica para verificar se o jogador está colidindo com a porta
-        // Retorne true se houver colisão, false caso contrário
-        // Exemplo básico:
-        const playerBounds = this.player.element.getBoundingClientRect();
-        const doorBounds = this.door.getBoundingClientRect();
-        return (
-            playerBounds.right > doorBounds.left &&
-            playerBounds.left < doorBounds.right &&
-            playerBounds.bottom > doorBounds.top &&
-            playerBounds.top < doorBounds.bottom
-        );
+        requestAnimationFrame(() => this.gameLoop());
     }
 }
 
