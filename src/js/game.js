@@ -344,7 +344,11 @@ class EscapeRoomGame {
     }
 
     showFeedback(message, type) {
-        // ... (seu código de feedback, sem alterações)
+        // Remove feedback anterior, se existir
+        const oldFeedback = document.querySelector('.feedback');
+        if (oldFeedback) {
+            oldFeedback.remove();
+        }
         const feedback = document.createElement('div');
         feedback.className = `feedback ${type}`;
         feedback.style.position = 'fixed';
