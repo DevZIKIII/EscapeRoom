@@ -1,3 +1,11 @@
+// Funções utilitárias para ranking local
+function getLocalHighScore() {
+    return parseInt(localStorage.getItem('escapeRoomHighScore') || '0', 10);
+}
+
+function setLocalHighScore(score) {
+    localStorage.setItem('escapeRoomHighScore', score);
+}
 import rooms from './rooms.js';
 
 // Função utilitária para embaralhar arrays (Fisher-Yates)
@@ -79,6 +87,12 @@ class EscapeRoomGame {
             this.h1Title.textContent = `Escape Room - ${roomName}`;
         }
         document.getElementById('room-info').textContent = roomName;
+
+        // Exibe o recorde local na interface (se existir elemento)
+        const highScoreEl = document.getElementById('high-score');
+        if (highScoreEl) {
+            highScoreEl.textContent = `Recorde: ${getLocalHighScore()}`;
+        }
     }
 
     initializeRoom() {
@@ -350,6 +364,17 @@ class EscapeRoomGame {
         if (timeBonus > 0) {
             this.score += timeBonus;
         }
+
+        // Ranking local: verifica e salva recorde
+        const previousHighScore = getLocalHighScore();
+        let rankingMsg = '';
+        if (this.score > previousHighScore) {
+            setLocalHighScore(this.score);
+            rankingMsg = `<p>🏆 Novo recorde! Sua melhor pontuação: ${this.score}</p>`;
+        } else {
+            rankingMsg = `<p>Sua melhor pontuação: ${previousHighScore}</p>`;
+        }
+
         const gameWin = document.createElement('div');
         gameWin.className = 'game-over';
         gameWin.innerHTML = `
@@ -358,6 +383,7 @@ class EscapeRoomGame {
             <p>Pontuação Final: ${this.score} pontos</p>
             <p>Tempo restante: ${Math.floor(this.timeLeft / 60)}:${(this.timeLeft % 60).toString().padStart(2, '0')}</p>
             ${timeBonus > 0 ? `<p>Bônus por tempo restante: +${timeBonus} pontos!</p>` : ''}
+            ${rankingMsg}
             <p>Você é um verdadeiro detetive de fake news!</p>
             <button class="restart-btn" onclick="location.reload()">Jogar Novamente</button>
         `;
