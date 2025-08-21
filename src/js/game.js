@@ -163,21 +163,32 @@ class EscapeRoomGame {
         const newsItem = document.createElement('div');
         newsItem.className = 'news-item';
 
-        // Lógica de spawn aleatório em PORCENTAGEM para TODOS os itens
-        // Gera um valor entre 10% e 90% para não nascer colado nas bordas
-        const pos = {
-            x: 10 + Math.random() * 60,
-            y: 10 + Math.random() * 70
-        };
+        // Evita sobreposição: tenta até encontrar posição livre
+        let pos, tentativas = 0, sobrepoe;
+        do {
+            pos = {
+                x: 10 + Math.random() * 60,
+                y: 10 + Math.random() * 70
+            };
+            sobrepoe = false;
+            for (const item of this.newsItems) {
+                const dx = pos.x - item.xPercent;
+                const dy = pos.y - item.yPercent;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 10) { // distância mínima em % (ajuste se necessário)
+                    sobrepoe = true;
+                    break;
+                }
+            }
+            tentativas++;
+        } while (sobrepoe && tentativas < 50);
 
-        // Aplica o estilo usando a unidade de porcentagem '%'
         newsItem.style.left = pos.x + '%';
         newsItem.style.top = pos.y + '%';
         newsItem.dataset.questionId = questionData.id;
 
         container.appendChild(newsItem);
 
-        // Armazena a posição em porcentagem para o cálculo de colisão
         this.newsItems.push({
             element: newsItem,
             xPercent: pos.x,
