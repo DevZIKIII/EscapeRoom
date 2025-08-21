@@ -2,18 +2,18 @@
 export const rooms = [
   {
     id: 1,
-    name: 'Algoritmos',
-    description: 'Resolva enigmas sobre algoritmos para avançar.'
+    name: 'Biologia',
+    description: 'Desvende mitos e verdades sobre saúde, genética e meio ambiente.'
   },
   {
     id: 2,
-    name: 'Estruturas de Dados',
-    description: 'Teste seus conhecimentos em estruturas de dados.'
+    name: 'História',
+    description: 'Descubra o que é fato ou fake sobre grandes eventos históricos.'
   },
   {
     id: 3,
-    name: 'Programação Orientada a Objetos',
-    description: 'Desvende os mistérios da POO para escapar.'
+    name: 'Matemática',
+    description: 'Analise dados, estatísticas e desvende fake news numéricas.'
   }
 ];
 export default rooms;

@@ -1,6 +1,9 @@
 import rooms from './rooms.js';
 
 class EscapeRoomGame {
+    correctStreak = 0;
+    wrongStreak = 0;
+    movementPaused = false;
     constructor() {
         this.player = {
             x: 40,
@@ -108,6 +111,7 @@ class EscapeRoomGame {
     }
 
     updatePlayer() {
+        if (this.movementPaused) return;
         const speed = 4;
         let moved = false;
 
@@ -207,7 +211,7 @@ class EscapeRoomGame {
         this.currentQuestionIndex = itemIndex;
         document.getElementById('modal-news').textContent = questionData.text;
         document.getElementById('modal').classList.remove('hidden');
-        this.gameRunning = false;
+        this.movementPaused = true;
     }
 
     answerQuestion(userSaysFake) {
@@ -218,16 +222,30 @@ class EscapeRoomGame {
         if (isCorrect) {
             this.score += 10;
             this.addDigitToPassword(questionData.digit);
-            this.showFeedback(`Correto! +10 pontos. Número ${questionData.digit} adicionado à senha!`, 'correct');
             item.element.remove();
             item.collected = true;
+            this.correctStreak = (this.correctStreak || 0) + 1;
+            let bonus = 0;
+            // Bônus para streaks maiores
+            const streakBonuses = [3,5,7,10,12,15,20,25,30,40,50];
+            if (streakBonuses.includes(this.correctStreak)) {
+                bonus = this.correctStreak * 5;
+                this.score += bonus;
+                this.showFeedback(`Correto! +10 pontos. Número ${questionData.digit} adicionado à senha!\nBônus de streak: +${bonus} pontos!`, 'correct');
+            } else {
+                this.showFeedback(`Correto! +10 pontos. Número ${questionData.digit} adicionado à senha!`, 'correct');
+            }
         } else {
-            this.showFeedback(questionData.explanation, 'incorrect');
+            this.wrongStreak = (this.wrongStreak || 0) + 1;
+            this.correctStreak = 0;
+            const penalty = this.wrongStreak * 5;
+            this.timeLeft = Math.max(0, this.timeLeft - penalty);
+            this.showFeedback(`${questionData.explanation}\nTempo perdido: -${penalty} segundos!`, 'incorrect');
         }
 
         this.updateUI();
         document.getElementById('modal').classList.add('hidden');
-        this.gameRunning = true;
+        this.movementPaused = false;
     }
 
     addDigitToPassword(digit) {
@@ -263,7 +281,8 @@ class EscapeRoomGame {
         // CORREÇÃO: Mover o jogador e resetar a senha IMEDIATAMENTE
         // Isso evita que o jogo entre em um loop de passar de fase.
         this.resetPlayerPosition();
-        this.foundDigits = 0; // Essencial para invalidar a condição da porta na próxima checagem
+    this.foundDigits = 0; // Essencial para invalidar a condição da porta na próxima checagem
+    // Não zera mais o streak de penalidade ao mudar de sala
 
         this.currentRoom++;
 
@@ -284,6 +303,11 @@ class EscapeRoomGame {
     winGame() {
         this.gameRunning = false;
         clearInterval(this.timerInterval);
+        // Bônus por tempo restante: 1 ponto para cada 2 segundos restantes
+        let timeBonus = Math.floor(this.timeLeft / 2);
+        if (timeBonus > 0) {
+            this.score += timeBonus;
+        }
         const gameWin = document.createElement('div');
         gameWin.className = 'game-over';
         gameWin.innerHTML = `
@@ -291,6 +315,7 @@ class EscapeRoomGame {
             <p>Você escapou de todas as salas!</p>
             <p>Pontuação Final: ${this.score} pontos</p>
             <p>Tempo restante: ${Math.floor(this.timeLeft / 60)}:${(this.timeLeft % 60).toString().padStart(2, '0')}</p>
+            ${timeBonus > 0 ? `<p>Bônus por tempo restante: +${timeBonus} pontos!</p>` : ''}
             <p>Você é um verdadeiro detetive de fake news!</p>
             <button class="restart-btn" onclick="location.reload()">Jogar Novamente</button>
         `;
