@@ -90,6 +90,24 @@ class EscapeRoomGame {
         document.getElementById('real-btn').addEventListener('click', () => this.answerQuestion(false));
 
         this.door.addEventListener('click', () => this.tryOpenDoor());
+
+        // Botão de pause
+        const pauseBtn = document.getElementById('pause-btn');
+        if (pauseBtn) {
+            pauseBtn.addEventListener('click', () => {
+                this.togglePause();
+            });
+        }
+    }
+    togglePause() {
+        this.gameRunning = !this.gameRunning;
+        this.movementPaused = !this.gameRunning;
+        const pauseBtn = document.getElementById('pause-btn');
+        if (pauseBtn) {
+            pauseBtn.textContent = this.gameRunning ? '⏸️ Pausar' : '▶️ Retomar';
+        }
+        // Exibe feedback visual
+        this.showFeedback(this.gameRunning ? 'Jogo retomado!' : 'Jogo pausado!', this.gameRunning ? 'correct' : 'incorrect');
     }
 
     handleKeyDown(e) {
@@ -281,8 +299,11 @@ class EscapeRoomGame {
         // CORREÇÃO: Mover o jogador e resetar a senha IMEDIATAMENTE
         // Isso evita que o jogo entre em um loop de passar de fase.
         this.resetPlayerPosition();
-    this.foundDigits = 0; // Essencial para invalidar a condição da porta na próxima checagem
-    // Não zera mais o streak de penalidade ao mudar de sala
+        this.foundDigits = 0; // Essencial para invalidar a condição da porta na próxima checagem
+        // Não zera mais o streak de penalidade ao mudar de sala
+
+        // Adiciona 1 minuto ao cronômetro ao passar de sala
+        this.timeLeft += 60;
 
         this.currentRoom++;
 
@@ -292,7 +313,7 @@ class EscapeRoomGame {
         }
         
         this.door.classList.remove('unlocked');
-        this.showFeedback(`Parabéns! Você passou para a Sala ${this.currentRoom}!`, 'correct');
+        this.showFeedback(`Parabéns! Você passou para a Sala ${this.currentRoom}! +1 minuto no cronômetro!`, 'correct');
 
         // O resto da inicialização da sala pode acontecer após o atraso
         setTimeout(() => {
