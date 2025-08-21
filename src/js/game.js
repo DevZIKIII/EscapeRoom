@@ -1,5 +1,14 @@
 import rooms from './rooms.js';
 
+// Função utilitária para embaralhar arrays (Fisher-Yates)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
 class EscapeRoomGame {
     correctStreak = 0;
     wrongStreak = 0;
@@ -11,8 +20,10 @@ class EscapeRoomGame {
             element: document.getElementById('player'),
         };
 
-        this.currentRoom = 1;
-        this.maxRooms = rooms.length;
+        // Embaralha as salas ao iniciar o jogo
+        this.shuffledRooms = shuffleArray([...rooms]);
+        this.currentRoomIndex = 0;
+        this.maxRooms = this.shuffledRooms.length;
         this.foundDigits = 0;
         this.passwordLength = 5;
         this.score = 0;
@@ -22,7 +33,6 @@ class EscapeRoomGame {
         this.currentPassword = [];
         this.newsItems = [];
 
-        // CORREÇÃO 1: Usando o seletor correto para o ID 'room-title'
         this.h1Title = document.getElementById('room-title');
         this.canvas = document.getElementById('game-canvas');
         this.door = document.getElementById('door');
@@ -48,7 +58,12 @@ class EscapeRoomGame {
     async loadRoomData() {
         try {
             const response = await fetch('data/questions.json');
-            this.roomData = await response.json();
+            const data = await response.json();
+            // Embaralha as perguntas de cada sala
+            this.roomData = {};
+            Object.keys(data).forEach(roomKey => {
+                this.roomData[roomKey] = shuffleArray([...data[roomKey]]);
+            });
         } catch (error) {
             console.error('Erro ao carregar dados das salas:', error);
         }
@@ -56,8 +71,8 @@ class EscapeRoomGame {
 
     // CORREÇÃO 2: Mantida a versão correta da função e removida a duplicada
     updateRoomInfo() {
-        const currentRoomData = rooms.find(room => room.id === this.currentRoom);
-        const roomName = currentRoomData ? currentRoomData.name : `Sala ${this.currentRoom}`;
+        const currentRoomData = this.shuffledRooms[this.currentRoomIndex];
+        const roomName = currentRoomData ? currentRoomData.name : `Sala ${this.currentRoomIndex + 1}`;
 
         // Atualiza o título H1 e a informação da sala
         if (this.h1Title) {
@@ -70,7 +85,7 @@ class EscapeRoomGame {
         this.currentPassword = Array(this.passwordLength).fill('_');
         this.foundDigits = 0;
         this.updatePasswordDisplay();
-        this.spawnNewsItems(); // Esta função agora existe
+        this.spawnNewsItems();
         this.updateRoomInfo();
         this.resetPlayerPosition();
     }
@@ -147,10 +162,12 @@ class EscapeRoomGame {
     // CORREÇÃO 3: Função que faltava foi adicionada
     spawnNewsItems() {
         const container = document.getElementById('news-items');
-        container.innerHTML = ''; // Limpa itens antigos
+        container.innerHTML = '';
         this.newsItems = [];
 
-        const roomQuestions = this.roomData[`room${this.currentRoom}`];
+        // Pega o id da sala embaralhada atual
+        const currentRoomId = this.shuffledRooms[this.currentRoomIndex].id;
+        const roomQuestions = this.roomData[`room${currentRoomId}`];
         if (roomQuestions) {
             roomQuestions.forEach((question, index) => {
                 this.spawnNewsItem(question, index);
@@ -296,7 +313,7 @@ class EscapeRoomGame {
 
     tryOpenDoor() {
         if (this.isPlayerCollidingWithDoor() && this.foundDigits === this.passwordLength) {
-            if (this.currentRoom < this.maxRooms) {
+            if (this.currentRoomIndex < this.maxRooms - 1) {
                 this.nextRoom();
             } else {
                 this.winGame();
@@ -307,26 +324,19 @@ class EscapeRoomGame {
     }
 
     nextRoom() {
-        // CORREÇÃO: Mover o jogador e resetar a senha IMEDIATAMENTE
-        // Isso evita que o jogo entre em um loop de passar de fase.
         this.resetPlayerPosition();
-        this.foundDigits = 0; // Essencial para invalidar a condição da porta na próxima checagem
-        // Não zera mais o streak de penalidade ao mudar de sala
-
-        // Adiciona 1 minuto ao cronômetro ao passar de sala
+        this.foundDigits = 0;
         this.timeLeft += 60;
+        this.currentRoomIndex++;
 
-        this.currentRoom++;
-
-        if (this.currentRoom > this.maxRooms) {
+        if (this.currentRoomIndex >= this.maxRooms) {
             this.winGame();
             return;
         }
-        
-        this.door.classList.remove('unlocked');
-        this.showFeedback(`Parabéns! Você passou para a Sala ${this.currentRoom}! +1 minuto no cronômetro!`, 'correct');
 
-        // O resto da inicialização da sala pode acontecer após o atraso
+        this.door.classList.remove('unlocked');
+        this.showFeedback(`Parabéns! Você passou para a Sala ${this.currentRoomIndex + 1}! +1 minuto no cronômetro!`, 'correct');
+
         setTimeout(() => {
             this.initializeRoom();
         }, 1500);
