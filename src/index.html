@@ -8,38 +8,130 @@
     <script type="module" src="js/main.js"></script>
 </head>
 <body>
+    <!-- Tutorial Modal -->
+    <div id="tutorial-modal" class="modal">
+        <div class="modal-content tutorial">
+            <h2>🕵️ Como Jogar - Caçador de Fake News</h2>
+            <div class="tutorial-content">
+                <h3>🎯 Objetivo</h3>
+                <p>Colete notícias, identifique fake news e descubra a senha para escapar de cada sala!</p>
+                
+                <h3>🎮 Controles</h3>
+                <p>Use as setas ⬅️➡️⬆️⬇️ para mover o detetive</p>
+                
+                <h3>💼 Mochila</h3>
+                <p>Pressione <kbd>B</kbd> para abrir sua mochila com itens especiais</p>
+                
+                <h3>🎁 Power-ups</h3>
+                <ul>
+                    <li>⏰ <strong>Relógio</strong>: +30 segundos</li>
+                    <li>💡 <strong>Lupa</strong>: Revela uma dica</li>
+                    <li>🛡️ <strong>Escudo</strong>: Protege de penalidade</li>
+                    <li>⚡ <strong>Velocidade</strong>: Movimento 2x mais rápido</li>
+                    <li>🎯 <strong>Radar</strong>: Mostra itens por 5 segundos</li>
+                </ul>
+                
+                <h3>🏆 Pontuação</h3>
+                <p>Acumule pontos com sequências de acertos e ganhe bônus especiais!</ព>
+                
+                <button id="start-game-btn" class="btn start">Começar Jogo</button>
+            </div>
+        </div>
+    </div>
+
     <div id="game-root">
-        <h1 id="room-title"></h1>
+        <h1 id="room-title">Escape Room - Carregando...</h1>
         <div id="game-stats">
             <button id="pause-btn" class="btn" style="margin-bottom: 8px;">⏸️ Pausar</button>
+            <button id="mochila-btn" class="btn" style="margin-bottom: 8px;">💼 Mochila</button>
+            <button id="sound-btn" class="btn" style="margin-bottom: 8px;">🔊 Som</button>
             <div id="high-score">Recorde: 0</div>
             <div id="score">Pontos: 0</div>
             <div id="timer">Tempo: 10:00</div>
             <div id="room-info">Sala 1</div>
+            <div id="streak-info">Sequência: 0</div>
         </div>
+        
+        <!-- Barra de Dificuldade -->
+        <div id="difficulty-bar">
+            <span>Dificuldade:</span>
+            <div class="difficulty-progress">
+                <div class="difficulty-fill" style="width: 11%"></div>
+            </div>
+            <span id="difficulty-level">Nível 1/9</span>
+        </div>
+        
         <div class="password-display">
             <p>Senha da Porta:</p>
             <div id="password-digits">_ _ _ _ _</div>
             <p id="password-hint">Encontre notícias e responda corretamente para descobrir os números!</p>
         </div>
+        
+        <!-- Canvas do Jogo -->
         <div id="game-canvas">
             <div id="player"></div>
             <div id="news-items"></div>
+            <div id="power-ups"></div>
             <div class="door" id="door"></div>
+            <!-- Indicador de Movimento -->
+            <div id="movement-indicator"></div>
         </div>
+        
+        <!-- Modal de Notícias -->
         <div id="modal" class="modal hidden">
             <div class="modal-content">
                 <h3 id="modal-title">Notícia Encontrada!</h3>
                 <p id="modal-news"></p>
+                <div id="hint-section" class="hidden">
+                    <p class="hint-text">💡 Dica: <span id="hint-content"></span></p>
+                </div>
                 <div class="modal-buttons">
+                    <button id="use-hint-btn" class="btn hint">💡 Usar Dica</button>
                     <button id="fake-btn" class="btn fake">🚫 Fake News</button>
                     <button id="real-btn" class="btn real">✅ Notícia Real</button>
                 </div>
             </div>
         </div>
-        <div id="instructions">
-            <p>Use as setas ⬅️➡️⬆️⬇️ para mover o bonequinho e encontre as notícias!</p>
+        
+        <!-- Modal da Mochila -->
+        <div id="mochila-modal" class="modal hidden">
+            <div class="modal-content mochila">
+                <h3>💼 Sua Mochila</h3>
+                <div id="inventory-grid">
+                    <!-- Items serão adicionados dinamicamente -->
+                </div>
+                <p class="mochila-tip">Clique em um item para usá-lo</p>
+                <button id="close-mochila" class="btn">Fechar</button>
+            </div>
         </div>
+        
+        <!-- Instruções -->
+        <div id="instructions">
+            <p>Use as setas ⬅️➡️⬆️⬇️ para mover | Pressione <kbd>B</kbd> para abrir a mochila | Colete power-ups dourados!</p>
+        </div>
+        
+        <!-- Efeitos Visuais -->
+        <div id="effects-container"></div>
     </div>
+    
+    <!-- Sistema de Som -->
+    <audio id="collect-sound" preload="auto">
+        <source src="sounds/collect.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correct-sound" preload="auto">
+        <source src="sounds/correct.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="wrong-sound" preload="auto">
+        <source src="sounds/wrong.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="powerup-sound" preload="auto">
+        <source src="sounds/powerup.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="unlock-sound" preload="auto">
+        <source src="sounds/unlock.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="background-music" loop preload="auto">
+        <source src="sounds/background.mp3" type="audio/mpeg">
+    </audio>
 </body>
 </html>
