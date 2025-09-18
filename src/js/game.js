@@ -562,6 +562,7 @@ class EscapeRoomGame {
     }
     
     checkCollisions() {
+        if (this.movementPaused) return;
         // Colisão com notícias
         this.newsItems.forEach((item, index) => {
             if (item.collected) return;
@@ -631,25 +632,49 @@ class EscapeRoomGame {
     }
     
     showNewsModal(questionData, itemIndex) {
-        this.currentQuestionIndex = itemIndex;
-        this.currentQuestion = questionData;
-        
-        document.getElementById('modal-news').textContent = questionData.text;
-        document.getElementById('modal').classList.remove('hidden');
-        this.movementPaused = true;
-        
-        // Verificar se tem item de dica
-        const hintBtn = document.getElementById('use-hint-btn');
-        if (this.inventory.items.hint > 0) {
-            hintBtn.style.display = 'inline-block';
-        } else {
-            hintBtn.style.display = 'none';
-        }
-        
-        // Resetar seção de dica
-        document.getElementById('hint-section').classList.add('hidden');
+    this.currentQuestionIndex = itemIndex;
+    this.currentQuestion = questionData;
+    
+    document.getElementById('modal-news').textContent = questionData.text;
+    document.getElementById('modal').classList.remove('hidden');
+    this.movementPaused = true;
+    
+    // Verificar se tem item de dica
+    const hintBtn = document.getElementById('use-hint-btn');
+    if (this.inventory.items.hint > 0) {
+        hintBtn.style.display = 'inline-block';
+    } else {
+        hintBtn.style.display = 'none';
     }
     
+    // Resetar seção de dica
+    document.getElementById('hint-section').classList.add('hidden');
+    // ✨ LINHA ADICIONADA PARA A CORREÇÃO ✨
+    document.getElementById('hint-content').textContent = ''; 
+}
+    // CÓDIGO CORRIGIDO
+
+showNewsModal(questionData, itemIndex) {
+    this.currentQuestionIndex = itemIndex;
+    this.currentQuestion = questionData;
+    
+    document.getElementById('modal-news').textContent = questionData.text;
+    document.getElementById('modal').classList.remove('hidden');
+    this.movementPaused = true;
+    
+    // Verificar se tem item de dica
+    const hintBtn = document.getElementById('use-hint-btn');
+    if (this.inventory.items.hint > 0) {
+        hintBtn.style.display = 'inline-block';
+    } else {
+        hintBtn.style.display = 'none';
+    }
+    
+    // Resetar seção de dica
+    document.getElementById('hint-section').classList.add('hidden');
+    document.getElementById('hint-content').textContent = ''; // <-- ADICIONE ESTA LINHA
+}
+
     useHint() {
         if (this.inventory.items.hint > 0 && this.currentQuestion) {
             this.inventory.items.hint--;
@@ -694,20 +719,23 @@ class EscapeRoomGame {
                     'correct'
                 );
             }
-        } else {
+        } else { // Se a resposta estiver INCORRETA
             this.soundManager.play('wrong');
             this.wrongStreak++;
-            this.correctStreak = 0;
-            
+    
             // Aplicar penalidade ou usar escudo
             if (this.shieldActive) {
+                // Se o escudo estiver ativo, ele apenas é consumido
                 this.shieldActive = false;
                 document.getElementById('game-canvas').classList.remove('shield-active');
                 this.showFeedback(
-                    `❌ ${questionData.explanation}\n🛡️ Escudo absorveu a penalidade!`,
+                    `❌ ${questionData.explanation}\n🛡️ Escudo absorveu a penalidade e protegeu sua sequência!`,
                     'incorrect'
                 );
             } else {
+                // Se não tiver escudo, aplica a penalidade E zera a sequência
+                this.correctStreak = 0; // <-- CORREÇÃO: Movido para cá
+        
                 const penalty = Math.min(this.wrongStreak * 5, 20);
                 this.timeLeft = Math.max(0, this.timeLeft - penalty);
                 this.showFeedback(
