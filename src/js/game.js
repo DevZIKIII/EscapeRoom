@@ -7,6 +7,338 @@ function setLocalHighScore(score) {
     localStorage.setItem('escapeRoomHighScore', score);
 }
 
+class AccessibilityManager {
+    constructor(game) {
+        this.game = game;
+        this.enabled = false;
+        this.proximityCheckInterval = null;
+        this.lastProximityState = null;
+        this.directionalSoundInterval = null;
+        
+        // Sons de proximidade - CONFIGURE SEUS SONS AQUI
+        this.sounds = {
+            close: document.getElementById('proximity-close-sound'),
+            medium: document.getElementById('proximity-medium-sound'),
+            far: document.getElementById('proximity-far-sound'),
+            direction: document.getElementById('direction-sound')
+        };
+        
+        // Configurar volumes
+        Object.values(this.sounds).forEach(sound => {
+            if (sound) sound.volume = 0.7;
+        });
+    }
+    
+    enable() {
+        this.enabled = true;
+        document.body.classList.add('accessibility-mode');
+        document.getElementById('accessibility-indicator').classList.remove('hidden');
+        
+        // Iniciar verificação de proximidade
+        this.startProximityCheck();
+        
+        // Anunciar modo ativado
+        this.speak('Modo acessibilidade ativado. O tempo foi pausado. Use os sons para localizar as notícias.');
+    }
+    
+    disable() {
+        this.enabled = false;
+        document.body.classList.remove('accessibility-mode');
+        document.getElementById('accessibility-indicator').classList.add('hidden');
+        
+        // Parar verificações
+        this.stopProximityCheck();
+    }
+    
+    startProximityCheck() {
+        this.proximityCheckInterval = setInterval(() => {
+            if (!this.game.gameRunning || this.game.movementPaused) return;
+            
+            const nearestNews = this.findNearestNewsItem();
+            if (nearestNews) {
+                this.handleProximityFeedback(nearestNews);
+            }
+        }, 500); // Verificar a cada 500ms
+    }
+    
+    stopProximityCheck() {
+        if (this.proximityCheckInterval) {
+            clearInterval(this.proximityCheckInterval);
+            this.proximityCheckInterval = null;
+        }
+        if (this.directionalSoundInterval) {
+            clearInterval(this.directionalSoundInterval);
+            this.directionalSoundInterval = null;
+        }
+    }
+    
+    findNearestNewsItem() {
+        let nearest = null;
+        let minDistance = Infinity;
+        
+        this.game.newsItems.forEach(item => {
+            if (item.collected) return;
+            
+            const itemPixelX = (item.xPercent / 100) * this.game.canvas.offsetWidth;
+            const itemPixelY = (item.yPercent / 100) * this.game.canvas.offsetHeight;
+            
+            const distance = Math.sqrt(
+                Math.pow(this.game.player.x - itemPixelX, 2) +
+                Math.pow(this.game.player.y - itemPixelY, 2)
+            );
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearest = { item, distance, x: itemPixelX, y: itemPixelY };
+            }
+        });
+        
+        return nearest;
+    }
+    
+    handleProximityFeedback(nearestNews) {
+        const { distance, x, y } = nearestNews;
+        let proximityState;
+        
+        // Definir estado de proximidade
+        if (distance < 50) {
+            proximityState = 'close';
+        } else if (distance < 150) {
+            proximityState = 'medium';
+        } else if (distance < 250) {
+            proximityState = 'far';
+        } else {
+            proximityState = 'none';
+        }
+        
+        // Tocar som se mudou de estado
+        if (proximityState !== this.lastProximityState && proximityState !== 'none') {
+            this.playProximitySound(proximityState);
+            
+            // Adicionar indicador visual (opcional)
+            this.showProximityIndicator(nearestNews.item.element, proximityState);
+            
+            // Calcular direção
+            this.provideDirectionalFeedback(x, y);
+        }
+        
+        this.lastProximityState = proximityState;
+    }
+    
+    playProximitySound(state) {
+        const sound = this.sounds[state];
+        if (sound && this.game.soundManager.enabled) {
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log('Som de proximidade não disponível'));
+        }
+    }
+    
+    provideDirectionalFeedback(targetX, targetY) {
+        const dx = targetX - this.game.player.x;
+        const dy = targetY - this.game.player.y;
+        
+        // Calcular direção
+        let direction = '';
+        if (Math.abs(dx) > Math.abs(dy)) {
+            direction = dx > 0 ? 'direita' : 'esquerda';
+        } else {
+            direction = dy > 0 ? 'baixo' : 'cima';
+        }
+        
+        // Feedback por voz (usando API de síntese de voz)
+        if (this.lastProximityState === 'close') {
+            this.speak(`Notícia muito próxima à ${direction}`);
+        } else if (this.lastProximityState === 'medium') {
+            this.speak(`Notícia à ${direction}`);
+        }
+        
+        // Indicador visual de direção
+        this.showDirectionIndicator(direction);
+    }
+    
+    showProximityIndicator(element, state) {
+        // Remover indicadores anteriores
+        element.querySelectorAll('.proximity-indicator').forEach(el => el.remove());
+        
+        const indicator = document.createElement('div');
+        indicator.className = `proximity-indicator proximity-${state}`;
+        element.appendChild(indicator);
+        
+        setTimeout(() => indicator.remove(), 1000);
+    }
+    
+    showDirectionIndicator(direction) {
+        const player = this.game.player.element;
+        
+        // Remover indicadores anteriores
+        player.querySelectorAll('.direction-indicator').forEach(el => el.remove());
+        
+        const indicator = document.createElement('div');
+        indicator.className = 'direction-indicator';
+        
+        switch(direction) {
+            case 'cima':
+                indicator.classList.add('direction-north');
+                break;
+            case 'baixo':
+                indicator.classList.add('direction-south');
+                break;
+            case 'direita':
+                indicator.classList.add('direction-east');
+                break;
+            case 'esquerda':
+                indicator.classList.add('direction-west');
+                break;
+        }
+        
+        player.appendChild(indicator);
+        setTimeout(() => indicator.remove(), 1000);
+    }
+    
+    speak(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.2;
+            speechSynthesis.speak(utterance);
+        }
+    }
+}
+
+// Sistema de Controles Mobile
+class MobileControls {
+    constructor(game) {
+        this.game = game;
+        this.joystickBase = document.getElementById('joystick-base');
+        this.joystickStick = document.getElementById('joystick-stick');
+        this.isActive = false;
+        this.joystickData = {
+            startX: 0,
+            startY: 0,
+            currentX: 0,
+            currentY: 0,
+            angle: 0,
+            distance: 0
+        };
+        
+        this.detectMobile();
+        this.setupControls();
+    }
+    
+    detectMobile() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        
+        if (isMobile || isTouchDevice) {
+            this.enableMobileControls();
+        }
+    }
+    
+    enableMobileControls() {
+        document.getElementById('mobile-controls').classList.remove('hidden');
+        document.querySelector('.mobile-instructions').classList.remove('hidden');
+        document.querySelector('.desktop-instructions').classList.add('hidden');
+    }
+    
+    setupControls() {
+        // Joystick
+        this.joystickBase.addEventListener('touchstart', (e) => this.handleJoystickStart(e), { passive: false });
+        this.joystickBase.addEventListener('touchmove', (e) => this.handleJoystickMove(e), { passive: false });
+        this.joystickBase.addEventListener('touchend', (e) => this.handleJoystickEnd(e), { passive: false });
+        
+        // Botões de ação
+        document.getElementById('mobile-mochila')?.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.game.openInventory();
+        });
+        
+        document.getElementById('mobile-interact')?.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.game.tryOpenDoor();
+        });
+    }
+    
+    handleJoystickStart(e) {
+        e.preventDefault();
+        this.isActive = true;
+        
+        const touch = e.touches[0];
+        const rect = this.joystickBase.getBoundingClientRect();
+        
+        this.joystickData.startX = rect.left + rect.width / 2;
+        this.joystickData.startY = rect.top + rect.height / 2;
+    }
+    
+    handleJoystickMove(e) {
+        e.preventDefault();
+        if (!this.isActive) return;
+        
+        const touch = e.touches[0];
+        const maxDistance = 40; // Raio máximo do joystick
+        
+        let deltaX = touch.clientX - this.joystickData.startX;
+        let deltaY = touch.clientY - this.joystickData.startY;
+        
+        // Calcular distância e ângulo
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const angle = Math.atan2(deltaY, deltaX);
+        
+        // Limitar ao raio máximo
+        if (distance > maxDistance) {
+            deltaX = Math.cos(angle) * maxDistance;
+            deltaY = Math.sin(angle) * maxDistance;
+        }
+        
+        // Atualizar posição visual do stick
+        this.joystickStick.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
+        
+        // Converter para movimento do jogador
+        this.updatePlayerMovement(deltaX, deltaY, maxDistance);
+    }
+    
+    handleJoystickEnd(e) {
+        e.preventDefault();
+        this.isActive = false;
+        
+        // Resetar joystick visual
+        this.joystickStick.style.transform = 'translate(-50%, -50%)';
+        
+        // Parar movimento
+        this.game.keys.left = false;
+        this.game.keys.right = false;
+        this.game.keys.up = false;
+        this.game.keys.down = false;
+    }
+    
+    updatePlayerMovement(deltaX, deltaY, maxDistance) {
+        const threshold = maxDistance * 0.3; // 30% do raio para ativar movimento
+        
+        // Reset keys
+        this.game.keys.left = false;
+        this.game.keys.right = false;
+        this.game.keys.up = false;
+        this.game.keys.down = false;
+        
+        // Movimento horizontal
+        if (Math.abs(deltaX) > threshold) {
+            if (deltaX > 0) {
+                this.game.keys.right = true;
+            } else {
+                this.game.keys.left = true;
+            }
+        }
+        
+        // Movimento vertical
+        if (Math.abs(deltaY) > threshold) {
+            if (deltaY > 0) {
+                this.game.keys.down = true;
+            } else {
+                this.game.keys.up = true;
+            }
+        }
+    }
+}
+
 // Sistema de Som
 class SoundManager {
     constructor() {
@@ -218,6 +550,9 @@ class EscapeRoomGame {
         this.speedBoost = false;
         this.shieldActive = false;
         this.hintAvailable = false;
+        this.accessibilityMode = false;
+        this.accessibilityManager = new AccessibilityManager(this);
+        this.mobileControls = new MobileControls(this);
         
         // Elementos DOM
         this.h1Title = document.getElementById('room-title');
@@ -247,11 +582,20 @@ class EscapeRoomGame {
         const tutorialModal = document.getElementById('tutorial-modal');
         tutorialModal.classList.remove('hidden');
         
-        document.getElementById('start-game-btn').addEventListener('click', () => {
+        document.getElementById('normal-mode-btn').addEventListener('click', () => {
             tutorialModal.classList.add('hidden');
+            this.accessibilityMode = false;
+            this.startGame();
+        });
+        
+        document.getElementById('accessibility-mode-btn').addEventListener('click', () => {
+            tutorialModal.classList.add('hidden');
+            this.accessibilityMode = true;
+            this.accessibilityManager.enable();
             this.startGame();
         });
     }
+
     
     startGame() {
         this.gameRunning = true;
@@ -874,23 +1218,29 @@ showNewsModal(questionData, itemIndex) {
         this.timerInterval = setInterval(() => {
             if (!this.gameRunning) return;
             
-            this.timeLeft--;
+            // NÃO DECREMENTAR TEMPO NO MODO ACESSIBILIDADE
+            if (!this.accessibilityMode) {
+                this.timeLeft--;
+            }
+            
             const minutes = Math.floor(this.timeLeft / 60);
             const seconds = this.timeLeft % 60;
             const timerEl = document.getElementById('timer');
             
             timerEl.textContent = `Tempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
-            // Alerta visual quando tempo está acabando
-            if (this.timeLeft <= 60) {
-                timerEl.style.color = '#ff6b6b';
-                timerEl.style.animation = 'pulse-timer 0.5s infinite';
-            } else if (this.timeLeft <= 180) {
-                timerEl.style.color = '#ffa500';
-            }
-            
-            if (this.timeLeft <= 0) {
-                this.endGame('⏰ Tempo esgotado!');
+            // Alerta visual quando tempo está acabando (apenas modo normal)
+            if (!this.accessibilityMode) {
+                if (this.timeLeft <= 60) {
+                    timerEl.style.color = '#ff6b6b';
+                    timerEl.style.animation = 'pulse-timer 0.5s infinite';
+                } else if (this.timeLeft <= 180) {
+                    timerEl.style.color = '#ffa500';
+                }
+                
+                if (this.timeLeft <= 0) {
+                    this.endGame('⏰ Tempo esgotado!');
+                }
             }
         }, 1000);
     }
