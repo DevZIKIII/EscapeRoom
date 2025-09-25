@@ -1,0 +1,425 @@
+{
+  "room1": [
+    {
+      "id": 1,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'Nova pesquisa revela que comer sementes de maçã diariamente previne todas as doenças genéticas.'",
+      "isFake": true,
+      "digit": 4,
+      "explanation": "FAKE NEWS! Não há comprovação científica de que sementes de maçã previnam doenças genéticas. Informação sem base científica.",
+      "hint": "Sementes de maçã contêm cianeto. Seria seguro comer diariamente?"
+    },
+    {
+      "id": 2,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'Vacinas são essenciais para prevenir doenças infecciosas e salvar milhões de vidas todos os anos.'",
+      "isFake": false,
+      "digit": 7,
+      "explanation": "VERDADEIRO! Vacinas são comprovadamente eficazes na prevenção de doenças e são recomendadas por órgãos de saúde.",
+      "hint": "A OMS e todos os órgãos de saúde sérios apoiam a vacinação."
+    },
+    {
+      "id": 3,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: 'Estudo mostra que plantas transgênicas causam câncer em humanos após 2 anos de consumo.'",
+      "isFake": true,
+      "digit": 1,
+      "explanation": "FAKE NEWS! Não há evidências científicas que associem plantas transgênicas ao câncer em humanos.",
+      "hint": "Transgênicos são consumidos há décadas sem evidências de causar câncer."
+    },
+    {
+      "id": 4,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'A biodiversidade é fundamental para o equilíbrio dos ecossistemas e para a sobrevivência humana.'",
+      "isFake": false,
+      "digit": 9,
+      "explanation": "VERDADEIRO! A biodiversidade garante recursos naturais e equilíbrio ambiental, sendo essencial para a vida.",
+      "hint": "Ecossistemas diversos são mais resilientes e produtivos."
+    },
+    {
+      "id": 5,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Facebook afirma: 'Tomar vitamina C em excesso impede qualquer tipo de infecção viral.'",
+      "isFake": true,
+      "digit": 2,
+      "explanation": "FAKE NEWS! O excesso de vitamina C não impede infecções virais e pode causar problemas de saúde.",
+      "hint": "O corpo elimina o excesso de vitamina C pela urina, não acumula proteção."
+    }
+  ],
+  "room2": [
+    {
+      "id": 6,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'Descoberta recente mostra que a Segunda Guerra Mundial terminou em 1948.'",
+      "isFake": true,
+      "digit": 5,
+      "explanation": "FAKE NEWS! A Segunda Guerra Mundial terminou oficialmente em 1945. Informação incorreta.",
+      "hint": "VE Day foi em maio de 1945, VJ Day em agosto de 1945."
+    },
+    {
+      "id": 7,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'A Lei Áurea, que aboliu a escravidão no Brasil, foi assinada em 1888 pela Princesa Isabel.'",
+      "isFake": false,
+      "digit": 8,
+      "explanation": "VERDADEIRO! A Lei Áurea foi assinada em 13 de maio de 1888, abolindo a escravidão no Brasil.",
+      "hint": "13 de maio de 1888 é uma data histórica fundamental do Brasil."
+    },
+    {
+      "id": 8,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Twitter afirma: 'O Egito Antigo foi a primeira civilização a usar a internet para comunicação entre cidades.'",
+      "isFake": true,
+      "digit": 3,
+      "explanation": "FAKE NEWS! A internet foi criada no século XX. O Egito Antigo não tinha acesso a essa tecnologia.",
+      "hint": "A internet surgiu na década de 1960, muito depois do Egito Antigo!"
+    },
+    {
+      "id": 9,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: 'A Revolução Industrial foi um marco para o desenvolvimento tecnológico e social da humanidade.'",
+      "isFake": false,
+      "digit": 6,
+      "explanation": "VERDADEIRO! A Revolução Industrial trouxe grandes avanços tecnológicos e sociais.",
+      "hint": "A máquina a vapor e a produção em massa mudaram o mundo."
+    },
+    {
+      "id": 10,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'A história do Brasil começou com a chegada dos portugueses em 1800.'",
+      "isFake": true,
+      "digit": 0,
+      "explanation": "FAKE NEWS! Os portugueses chegaram ao Brasil em 1500, não em 1800.",
+      "hint": "Pedro Álvares Cabral chegou em 22 de abril de... qual século?"
+    }
+  ],
+  "room3": [
+    {
+      "id": 11,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: '99% dos brasileiros são milionários.'",
+      "isFake": true,
+      "digit": 6,
+      "explanation": "FAKE NEWS! Dados oficiais mostram que a maioria da população brasileira não é milionária. Gráficos podem ser manipulados.",
+      "hint": "O Brasil tem grande desigualdade social. 99% milionários seria impossível."
+    },
+    {
+      "id": 12,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'A média aritmética é uma das formas de calcular o valor central de um conjunto de dados.'",
+      "isFake": false,
+      "digit": 1,
+      "explanation": "VERDADEIRO! A média aritmética é um conceito fundamental em estatística.",
+      "hint": "Soma todos os valores e divide pela quantidade. Conceito básico de matemática."
+    },
+    {
+      "id": 13,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'Estudo afirma que se todos jogarem na loteria, todos ficarão ricos.'",
+      "isFake": true,
+      "digit": 7,
+      "explanation": "FAKE NEWS! A probabilidade de ganhar na loteria é muito baixa. Não é uma forma garantida de enriquecer.",
+      "hint": "O dinheiro do prêmio vem dos próprios apostadores. Impossível todos ganharem."
+    },
+    {
+      "id": 14,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Instagram diz: 'A análise de dados é importante para tomar decisões informadas em diversas áreas do conhecimento.'",
+      "isFake": false,
+      "digit": 3,
+      "explanation": "VERDADEIRO! A análise de dados é fundamental para decisões baseadas em evidências.",
+      "hint": "Big Data e análise estatística são essenciais no mundo moderno."
+    },
+    {
+      "id": 15,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'Uma pesquisa mostra que 100% das estatísticas na internet são verdadeiras.'",
+      "isFake": true,
+      "digit": 8,
+      "explanation": "FAKE NEWS! Nem todas as estatísticas divulgadas na internet são verdadeiras. É preciso checar as fontes.",
+      "hint": "Se fosse verdade, esta própria afirmação criaria um paradoxo!"
+    }
+  ],
+  "room4": [
+    {
+      "id": 16,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'O desmatamento da Amazônia não afeta o clima global, pois a floresta é pequena demais para influenciar o planeta.'",
+      "isFake": true,
+      "digit": 3,
+      "explanation": "FAKE NEWS! A Amazônia é fundamental para o equilíbrio climático global, influenciando chuvas e absorvendo CO2.",
+      "hint": "A Amazônia é chamada de 'pulmão do mundo' por algum motivo..."
+    },
+    {
+      "id": 17,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'O Brasil possui a maior reserva de água doce superficial do mundo.'",
+      "isFake": false,
+      "digit": 7,
+      "explanation": "VERDADEIRO! O Brasil é um dos países com maior quantidade de água doce superficial do planeta.",
+      "hint": "Bacia Amazônica e Aquífero Guarani são gigantescos."
+    },
+    {
+      "id": 18,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Facebook afirma: 'O deserto do Saara está localizado na América do Sul.'",
+      "isFake": true,
+      "digit": 1,
+      "explanation": "FAKE NEWS! O Saara fica no continente africano.",
+      "hint": "O maior deserto quente do mundo fica no norte da África."
+    },
+    {
+      "id": 19,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: 'A urbanização acelerada pode causar problemas como enchentes e poluição.'",
+      "isFake": false,
+      "digit": 5,
+      "explanation": "VERDADEIRO! O crescimento urbano desordenado pode gerar diversos problemas ambientais.",
+      "hint": "Impermeabilização do solo e ilhas de calor são problemas urbanos reais."
+    },
+    {
+      "id": 20,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'O Polo Norte é formado apenas por terra firme.'",
+      "isFake": true,
+      "digit": 9,
+      "explanation": "FAKE NEWS! O Polo Norte é composto principalmente por gelo sobre o oceano Ártico.",
+      "hint": "Diferente da Antártida, o Ártico é oceano congelado, não continente."
+    }
+  ],
+  "room5": [
+    {
+      "id": 21,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'Água destilada conduz eletricidade melhor que água do mar.'",
+      "isFake": true,
+      "digit": 2,
+      "explanation": "FAKE NEWS! Água destilada é praticamente isolante, enquanto a do mar conduz bem devido aos sais.",
+      "hint": "Sais dissolvidos criam íons que conduzem eletricidade."
+    },
+    {
+      "id": 22,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'O sal de cozinha é formado por sódio e cloro.'",
+      "isFake": false,
+      "digit": 6,
+      "explanation": "VERDADEIRO! O sal de cozinha é o cloreto de sódio (NaCl).",
+      "hint": "NaCl é a fórmula química mais básica que aprendemos."
+    },
+    {
+      "id": 23,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: 'Todo ácido é perigoso e pode queimar a pele.'",
+      "isFake": true,
+      "digit": 4,
+      "explanation": "FAKE NEWS! Nem todo ácido é perigoso, alguns são encontrados em alimentos como limão e vinagre.",
+      "hint": "Você come ácido cítrico no limão e ácido acético no vinagre!"
+    },
+    {
+      "id": 24,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Facebook afirma: 'A ferrugem é resultado da reação do ferro com o oxigênio e a água.'",
+      "isFake": false,
+      "digit": 8,
+      "explanation": "VERDADEIRO! A ferrugem é óxido de ferro formado pela reação com oxigênio e água.",
+      "hint": "Oxidação do ferro é um processo químico bem conhecido."
+    },
+    {
+      "id": 25,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'Plástico é um material biodegradável e se decompõe rapidamente na natureza.'",
+      "isFake": true,
+      "digit": 0,
+      "explanation": "FAKE NEWS! Plásticos levam centenas de anos para se decompor.",
+      "hint": "A poluição plástica é um problema ambiental justamente pela demora em degradar."
+    }
+  ],
+  "room6": [
+    {
+      "id": 26,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'A luz viaja mais devagar que o som.'",
+      "isFake": true,
+      "digit": 7,
+      "explanation": "FAKE NEWS! A luz viaja muito mais rápido que o som.",
+      "hint": "Por isso vemos o raio antes de ouvir o trovão!"
+    },
+    {
+      "id": 27,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'A gravidade é responsável por manter os planetas em órbita ao redor do Sol.'",
+      "isFake": false,
+      "digit": 3,
+      "explanation": "VERDADEIRO! A gravidade mantém os planetas em órbita.",
+      "hint": "Lei da Gravitação Universal de Newton explica as órbitas."
+    },
+    {
+      "id": 28,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Twitter afirma: 'O calor sempre flui do corpo mais frio para o mais quente.'",
+      "isFake": true,
+      "digit": 5,
+      "explanation": "FAKE NEWS! O calor flui do corpo mais quente para o mais frio.",
+      "hint": "Segunda Lei da Termodinâmica: calor flui naturalmente do quente para o frio."
+    },
+    {
+      "id": 29,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: 'A energia não pode ser criada nem destruída, apenas transformada.'",
+      "isFake": false,
+      "digit": 1,
+      "explanation": "VERDADEIRO! Princípio da conservação da energia.",
+      "hint": "Primeira Lei da Termodinâmica: conservação da energia."
+    },
+    {
+      "id": 30,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'O vácuo é um excelente condutor de som.'",
+      "isFake": true,
+      "digit": 9,
+      "explanation": "FAKE NEWS! O som não se propaga no vácuo, pois não há matéria para transmitir as ondas sonoras.",
+      "hint": "No espaço, ninguém pode ouvir você gritar!"
+    }
+  ],
+  "room7": [
+    {
+      "id": 31,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'A palavra 'excessão' está correta na norma culta da Língua Portuguesa.'",
+      "isFake": true,
+      "digit": 2,
+      "explanation": "FAKE NEWS! O correto é 'exceção', sem o 's' duplo.",
+      "hint": "Exceção vem do latim 'exceptio', sem 's' duplo."
+    },
+    {
+      "id": 32,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'Em 'Choveu muito ontem', o verbo é impessoal e não possui sujeito.'",
+      "isFake": false,
+      "digit": 4,
+      "explanation": "VERDADEIRO! Verbos que indicam fenômenos da natureza são impessoais.",
+      "hint": "Fenômenos naturais não têm 'alguém' que os realiza."
+    },
+    {
+      "id": 33,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Facebook afirma: 'A crase é obrigatória antes de palavras masculinas.'",
+      "isFake": true,
+      "digit": 6,
+      "explanation": "FAKE NEWS! A crase nunca ocorre antes de palavras masculinas.",
+      "hint": "Crase = a + a. Palavras masculinas usam 'o', não 'a'."
+    },
+    {
+      "id": 34,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: 'O plural de 'cidadão' é 'cidadãos'.'",
+      "isFake": false,
+      "digit": 8,
+      "explanation": "VERDADEIRO! O plural correto é 'cidadãos'.",
+      "hint": "Palavras terminadas em -ão geralmente fazem plural em -ões ou -ãos."
+    },
+    {
+      "id": 35,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'A palavra 'problema' é do gênero feminino.'",
+      "isFake": true,
+      "digit": 0,
+      "explanation": "FAKE NEWS! 'Problema' é um substantivo masculino.",
+      "hint": "O problema, não a problema. Origem grega masculina."
+    }
+  ],
+  "room8": [
+    {
+      "id": 36,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'A palavra 'advice' em inglês é contável, então pode-se dizer 'two advices'.'",
+      "isFake": true,
+      "digit": 5,
+      "explanation": "FAKE NEWS! 'Advice' é incontável em inglês, o correto é 'some advice' ou 'pieces of advice'.",
+      "hint": "Uncountable nouns: advice, information, furniture..."
+    },
+    {
+      "id": 37,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'O passado de 'go' é 'went'.'",
+      "isFake": false,
+      "digit": 7,
+      "explanation": "VERDADEIRO! 'Went' é o passado do verbo 'go'.",
+      "hint": "Go - went - gone. Verbo irregular básico."
+    },
+    {
+      "id": 38,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: 'Em inglês, 'actually' significa 'atualmente'.'",
+      "isFake": true,
+      "digit": 1,
+      "explanation": "FAKE NEWS! 'Actually' significa 'na verdade'; 'atualmente' é 'currently'.",
+      "hint": "False friend: actually ≠ atualmente."
+    },
+    {
+      "id": 39,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Instagram diz: 'A expressão 'How are you?' é usada para cumprimentar alguém.'",
+      "isFake": false,
+      "digit": 3,
+      "explanation": "VERDADEIRO! 'How are you?' é uma saudação comum em inglês.",
+      "hint": "Greeting básico do inglês, junto com 'Hello'."
+    },
+    {
+      "id": 40,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'O plural de 'child' é 'childs'.'",
+      "isFake": true,
+      "digit": 9,
+      "explanation": "FAKE NEWS! O plural correto é 'children'.",
+      "hint": "Child - children, como man - men. Plurais irregulares."
+    }
+  ],
+  "room9": [
+    {
+      "id": 41,
+      "sourceType": "Mensagem de WhatsApp",
+      "text": "Mensagem recebida em grupo: 'A Mona Lisa foi pintada por Leonardo da Vinci.'",
+      "isFake": false,
+      "digit": 6,
+      "explanation": "VERDADEIRO! A Mona Lisa é uma das obras mais famosas de Leonardo da Vinci.",
+      "hint": "Obra mais famosa do Louvre, pintada no século XVI."
+    },
+    {
+      "id": 42,
+      "sourceType": "Notícia online",
+      "text": "Notícia online circula: 'O cubismo é um movimento artístico que valoriza a representação fiel da realidade.'",
+      "isFake": true,
+      "digit": 8,
+      "explanation": "FAKE NEWS! O cubismo desconstrói a realidade em formas geométricas.",
+      "hint": "Picasso fragmentava as formas, não representava fielmente."
+    },
+    {
+      "id": 43,
+      "sourceType": "Blog de opinião",
+      "text": "Blog de opinião destaca: 'O samba é um gênero musical originário da França.'",
+      "isFake": true,
+      "digit": 2,
+      "explanation": "FAKE NEWS! O samba é um gênero musical brasileiro.",
+      "hint": "Patrimônio cultural brasileiro, com raízes africanas."
+    },
+    {
+      "id": 44,
+      "sourceType": "Postagem em rede social",
+      "text": "Postagem viral no Instagram diz: 'A escultura é uma das linguagens das artes visuais.'",
+      "isFake": false,
+      "digit": 4,
+      "explanation": "VERDADEIRO! Escultura é uma das principais linguagens das artes visuais.",
+      "hint": "Arte tridimensional, junto com pintura e desenho."
+    },
+    {
+      "id": 45,
+      "sourceType": "Manchete de jornal",
+      "text": "Manchete de jornal: 'O grafite é considerado uma forma de arte urbana.'",
+      "isFake": false,
+      "digit": 0,
+      "explanation": "VERDADEIRO! O grafite é reconhecido como arte urbana.",
+      "hint": "Arte de rua reconhecida mundialmente, com artistas como Banksy."
+    }
+  ]
+}
