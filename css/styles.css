@@ -5,15 +5,38 @@
     box-sizing: border-box;
 }
 
+/* Variáveis CSS para responsividade */
+:root {
+    --game-max-width: min(900px, 95vw);
+    --game-padding: clamp(10px, 2vw, 20px);
+    --font-size-base: clamp(14px, 1.5vw, 16px);
+    --font-size-title: clamp(1.5em, 4vw, 2em);
+    --button-min-height: clamp(40px, 5vh, 48px);
+    --canvas-height: clamp(300px, 50vh, 400px);
+    --player-size: clamp(30px, 4vw, 40px);
+    --news-size: clamp(25px, 3.5vw, 30px);
+    --powerup-size: clamp(28px, 4vw, 35px);
+    --door-width: clamp(40px, 6vw, 50px);
+    --door-height: clamp(55px, 8vw, 70px);
+}
+
+html {
+    font-size: var(--font-size-base);
+}
+
 body {
     font-family: 'Segoe UI', 'Arial', sans-serif;
     background: linear-gradient(135deg, #1e3c72, #2a5298);
     color: #fff;
     margin: 0;
-    padding: 10px;
+    padding: clamp(5px, 1vw, 10px);
     min-height: 100vh;
+    min-height: -webkit-fill-available;
     overflow: hidden;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* Animação de fundo */
@@ -36,18 +59,21 @@ body::before {
 
 /* Container Principal */
 #game-root {
-    max-width: 900px;
+    width: 100%;
+    max-width: var(--game-max-width);
     margin: 0 auto;
     background: rgba(0, 0, 0, 0.85);
-    border-radius: 15px;
-    padding: 20px;
+    border-radius: clamp(0px, 2vw, 15px);
+    padding: var(--game-padding);
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px);
     height: calc(100vh - 20px);
+    height: -webkit-fill-available;
     position: relative;
     display: flex;
     flex-direction: column;
     border: 2px solid rgba(255, 215, 0, 0.3);
+    overflow: hidden;
 }
 
 /* Título */
@@ -59,9 +85,10 @@ h1 {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-    font-size: 2em;
-    margin: 0 0 15px 0;
+    font-size: var(--font-size-title);
+    margin: 0 0 clamp(10px, 2vh, 15px) 0;
     animation: shimmer 3s ease-in-out infinite;
+    line-height: 1.2;
 }
 
 @keyframes shimmer {
@@ -71,29 +98,31 @@ h1 {
 
 /* Estatísticas do Jogo */
 #game-stats {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: clamp(5px, 1vw, 10px);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-    padding: 12px 15px;
+    padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 15px);
     border-radius: 10px;
-    margin-bottom: 10px;
-    font-size: 0.95em;
+    margin-bottom: clamp(5px, 1vh, 10px);
+    font-size: clamp(0.8em, 1.2vw, 0.95em);
     font-weight: bold;
     flex-shrink: 0;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    flex-wrap: wrap;
-    gap: 10px;
 }
 
-#game-stats > div {
-    padding: 5px 10px;
+#game-stats > div, #game-stats > button {
+    padding: clamp(3px, 0.5vw, 5px) clamp(5px, 1vw, 10px);
     border-radius: 5px;
     background: rgba(0, 0, 0, 0.3);
     transition: transform 0.2s;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-#game-stats > div:hover {
+#game-stats > div:hover, #game-stats > button:hover {
     transform: translateY(-2px);
 }
 
@@ -128,21 +157,39 @@ h1 {
     text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
 }
 
+/* Indicador de Acessibilidade */
+#accessibility-indicator {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    animation: pulse-accessibility 2s infinite;
+}
+
+#accessibility-indicator.hidden {
+    display: none;
+}
+
+@keyframes pulse-accessibility {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+
 /* Barra de Dificuldade */
 #difficulty-bar {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 15px;
+    gap: clamp(5px, 1vw, 10px);
+    padding: clamp(5px, 1vw, 8px) clamp(10px, 2vw, 15px);
     background: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 0.9em;
+    margin-bottom: clamp(5px, 1vh, 10px);
+    font-size: clamp(0.75em, 1.1vw, 0.9em);
 }
 
 .difficulty-progress {
     flex: 1;
-    height: 10px;
+    height: clamp(8px, 1.5vh, 10px);
     background: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
     overflow: hidden;
@@ -159,10 +206,10 @@ h1 {
 /* Display da Senha */
 .password-display {
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
-    padding: 12px;
+    padding: clamp(8px, 1.5vw, 12px);
     border-radius: 10px;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: clamp(5px, 1vh, 10px);
     border: 2px solid #ffd700;
     flex-shrink: 0;
     position: relative;
@@ -186,19 +233,19 @@ h1 {
 }
 
 .password-display p {
-    margin: 5px 0;
-    font-size: 0.9em;
+    margin: clamp(3px, 0.5vh, 5px) 0;
+    font-size: clamp(0.8em, 1.2vw, 0.9em);
     position: relative;
     z-index: 1;
 }
 
 #password-digits {
     font-family: 'Courier New', monospace;
-    font-size: 2em;
+    font-size: clamp(1.2em, 3vw, 2em);
     font-weight: bold;
     color: #ffd700;
-    letter-spacing: 0.3em;
-    margin: 10px 0;
+    letter-spacing: clamp(0.1em, 0.5vw, 0.3em);
+    margin: clamp(5px, 1vh, 10px) 0;
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
     position: relative;
     z-index: 1;
@@ -207,10 +254,11 @@ h1 {
 /* Canvas do Jogo */
 #game-canvas {
     width: 100%;
-    height: 400px;
+    height: var(--canvas-height);
+    min-height: 250px;
     background: linear-gradient(135deg, #2c3e50, #34495e);
-    border: 3px solid #ffd700;
-    border-radius: 12px;
+    border: clamp(2px, 0.3vw, 3px) solid #ffd700;
+    border-radius: clamp(8px, 1vw, 12px);
     position: relative;
     overflow: hidden;
     flex: 1;
@@ -223,15 +271,15 @@ h1 {
 
 /* Jogador */
 #player {
-    width: 40px;
-    height: 40px;
+    width: var(--player-size);
+    height: var(--player-size);
     background: radial-gradient(circle, #ffd700, #ffed4e);
     border-radius: 50%;
     position: absolute;
     transition: none;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
     z-index: 10;
-    border: 3px solid #ffed4e;
+    border: clamp(2px, 0.3vw, 3px) solid #ffed4e;
     animation: player-glow 2s ease-in-out infinite;
 }
 
@@ -246,7 +294,7 @@ h1 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 22px;
+    font-size: clamp(16px, 2.5vw, 22px);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
@@ -265,7 +313,7 @@ h1 {
     top: -25px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 16px;
+    font-size: clamp(12px, 2vw, 16px);
     animation: fadeUp 0.5s ease-out;
 }
 
@@ -275,7 +323,7 @@ h1 {
     bottom: -25px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 16px;
+    font-size: clamp(12px, 2vw, 16px);
     animation: fadeDown 0.5s ease-out;
 }
 
@@ -291,8 +339,8 @@ h1 {
 
 /* Itens de Notícia */
 .news-item {
-    width: 30px;
-    height: 30px;
+    width: var(--news-size);
+    height: var(--news-size);
     background: radial-gradient(circle, #4169E1, #1e3c72);
     border-radius: 50%;
     position: absolute;
@@ -309,7 +357,7 @@ h1 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 16px;
+    font-size: clamp(12px, 2vw, 16px);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
@@ -331,8 +379,8 @@ h1 {
 
 /* Power-ups */
 .power-up {
-    width: 35px;
-    height: 35px;
+    width: var(--powerup-size);
+    height: var(--powerup-size);
     position: absolute;
     cursor: pointer;
     animation: float-powerup 3s ease-in-out infinite;
@@ -349,23 +397,23 @@ h1 {
     50% { transform: translateY(-10px); }
 }
 
-.power-up.time::before { content: '⏰'; font-size: 28px; }
-.power-up.hint::before { content: '💡'; font-size: 28px; }
-.power-up.shield::before { content: '🛡️'; font-size: 28px; }
-.power-up.speed::before { content: '⚡'; font-size: 28px; }
-.power-up.radar::before { content: '🎯'; font-size: 28px; }
+.power-up.time::before { content: '⏰'; font-size: clamp(20px, 3vw, 28px); }
+.power-up.hint::before { content: '💡'; font-size: clamp(20px, 3vw, 28px); }
+.power-up.shield::before { content: '🛡️'; font-size: clamp(20px, 3vw, 28px); }
+.power-up.speed::before { content: '⚡'; font-size: clamp(20px, 3vw, 28px); }
+.power-up.radar::before { content: '🎯'; font-size: clamp(20px, 3vw, 28px); }
 
 /* Porta */
 .door {
     position: absolute;
-    right: 20px;
+    right: clamp(10px, 2vw, 20px);
     top: 50%;
     transform: translateY(-50%);
-    width: 50px;
-    height: 70px;
+    width: var(--door-width);
+    height: var(--door-height);
     background: linear-gradient(180deg, #8B4513, #A0522D, #654321);
     border-radius: 10px 10px 0 0;
-    border: 3px solid #654321;
+    border: clamp(2px, 0.3vw, 3px) solid #654321;
     box-shadow: 
         inset 0 0 20px rgba(0, 0, 0, 0.5),
         0 0 20px rgba(0, 0, 0, 0.7);
@@ -379,7 +427,7 @@ h1 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 30px;
+    font-size: clamp(22px, 3.5vw, 30px);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
 }
 
@@ -389,7 +437,7 @@ h1 {
     top: 70%;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 16px;
+    font-size: clamp(12px, 2vw, 16px);
 }
 
 .door:hover {
@@ -446,10 +494,12 @@ h1 {
 
 .modal-content {
     background: linear-gradient(135deg, #667eea, #764ba2);
-    padding: 30px;
+    padding: clamp(20px, 3vw, 30px);
     border-radius: 15px;
-    max-width: 500px;
-    width: 90%;
+    max-width: min(500px, 90vw);
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
     text-align: center;
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
     border: 3px solid #ffd700;
@@ -468,18 +518,18 @@ h1 {
     }
 }
 
-.modal-content h3 {
+.modal-content h2, .modal-content h3 {
     color: #ffd700;
-    margin-bottom: 20px;
-    font-size: 1.5em;
+    margin-bottom: clamp(15px, 2vh, 20px);
+    font-size: clamp(1.2em, 2.5vw, 1.5em);
     text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 .modal-content p {
-    font-size: 1.1em;
+    font-size: clamp(0.9em, 1.4vw, 1.1em);
     line-height: 1.5;
-    margin-bottom: 20px;
-    padding: 15px;
+    margin-bottom: clamp(15px, 2vh, 20px);
+    padding: clamp(10px, 2vw, 15px);
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -487,34 +537,48 @@ h1 {
 
 /* Modal Tutorial */
 .modal-content.tutorial {
-    max-width: 600px;
+    max-width: min(600px, 90vw);
     background: linear-gradient(135deg, #1e3c72, #2a5298);
 }
 
 .tutorial-content h3 {
     color: #00ff88;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    font-size: 1.2em;
+    margin-top: clamp(15px, 2vh, 20px);
+    margin-bottom: clamp(8px, 1vh, 10px);
+    font-size: clamp(1em, 1.8vw, 1.2em);
 }
 
 .tutorial-content ul {
     text-align: left;
     margin: 10px 0;
-    padding-left: 20px;
+    padding-left: clamp(15px, 2vw, 20px);
 }
 
 .tutorial-content li {
-    margin: 8px 0;
+    margin: clamp(5px, 1vh, 8px) 0;
     list-style: none;
     position: relative;
-    padding-left: 25px;
+    padding-left: clamp(20px, 3vw, 25px);
+    font-size: clamp(0.85em, 1.3vw, 1em);
 }
 
 .tutorial-content li::before {
     content: '✨';
     position: absolute;
     left: 0;
+}
+
+/* Seleção de Modo */
+.mode-selection {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.btn.accessibility {
+    background: linear-gradient(45deg, #00b894, #00cec9);
 }
 
 kbd {
@@ -528,22 +592,24 @@ kbd {
 /* Modal Mochila */
 .modal-content.mochila {
     background: linear-gradient(135deg, #8B4513, #A0522D);
-    max-width: 600px;
+    max-width: min(600px, 90vw);
 }
 
 #inventory-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 15px;
-    margin: 20px 0;
-    padding: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(50px, 10vw, 80px), 1fr));
+    gap: clamp(8px, 1.5vw, 15px);
+    margin: clamp(15px, 2vh, 20px) 0;
+    padding: clamp(10px, 2vw, 20px);
     background: rgba(0, 0, 0, 0.3);
     border-radius: 10px;
 }
 
 .inventory-item {
-    width: 80px;
-    height: 80px;
+    width: 100%;
+    aspect-ratio: 1;
+    min-width: 50px;
+    max-width: 100px;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid #ffd700;
     border-radius: 10px;
@@ -563,7 +629,7 @@ kbd {
 }
 
 .inventory-item .item-icon {
-    font-size: 32px;
+    font-size: clamp(24px, 4vw, 32px);
     margin-bottom: 5px;
 }
 
@@ -575,18 +641,18 @@ kbd {
     color: #000;
     padding: 2px 6px;
     border-radius: 10px;
-    font-size: 12px;
+    font-size: clamp(10px, 1.5vw, 12px);
     font-weight: bold;
 }
 
 .inventory-item .item-name {
-    font-size: 10px;
+    font-size: clamp(8px, 1.2vw, 10px);
     color: #ffd700;
 }
 
 .mochila-tip {
     color: #ffd700;
-    font-size: 0.9em;
+    font-size: clamp(0.8em, 1.2vw, 0.9em);
     font-style: italic;
     margin: 10px 0;
 }
@@ -594,23 +660,25 @@ kbd {
 /* Seção de Dicas */
 #hint-section {
     background: rgba(255, 215, 0, 0.2);
-    padding: 10px;
+    padding: clamp(8px, 1.5vw, 10px);
     border-radius: 8px;
-    margin: 15px 0;
+    margin: clamp(10px, 2vh, 15px) 0;
     border: 1px solid #ffd700;
 }
 
 .hint-text {
     color: #ffd700;
     font-style: italic;
+    font-size: clamp(0.85em, 1.3vw, 1em);
 }
 
 /* Botões */
 .btn {
-    padding: 12px 24px;
+    padding: clamp(10px, 1.5vh, 12px) clamp(16px, 3vw, 24px);
     border: none;
     border-radius: 8px;
-    font-size: 1em;
+    font-size: clamp(0.85em, 1.3vw, 1em);
+    min-height: var(--button-min-height);
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: bold;
@@ -660,8 +728,8 @@ kbd {
     background: linear-gradient(45deg, #00ff88, #00b894);
     color: white;
     box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
-    font-size: 1.2em;
-    padding: 15px 40px;
+    font-size: clamp(1em, 1.5vw, 1.2em);
+    padding: clamp(12px, 2vh, 15px) clamp(30px, 5vw, 40px);
 }
 
 .btn:hover {
@@ -672,9 +740,10 @@ kbd {
 /* Modal Buttons */
 .modal-buttons {
     display: flex;
-    gap: 15px;
+    gap: clamp(10px, 2vw, 15px);
     justify-content: center;
-    margin-top: 20px;
+    margin-top: clamp(15px, 2vh, 20px);
+    flex-wrap: wrap;
 }
 
 /* Feedback Visual */
@@ -683,10 +752,10 @@ kbd {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 20px 30px;
+    padding: clamp(15px, 2.5vw, 20px) clamp(20px, 4vw, 30px);
     border-radius: 10px;
     z-index: 1002;
-    font-size: 1.1em;
+    font-size: clamp(0.9em, 1.4vw, 1.1em);
     font-weight: bold;
     max-width: 80%;
     text-align: center;
@@ -722,13 +791,15 @@ kbd {
     left: 50%;
     transform: translate(-50%, -50%);
     background: linear-gradient(135deg, #667eea, #764ba2);
-    padding: 40px;
+    padding: clamp(25px, 4vw, 40px);
     border-radius: 20px;
     text-align: center;
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
     border: 3px solid #ffd700;
     z-index: 1001;
     animation: zoomIn 0.5s ease;
+    max-width: min(500px, 90vw);
+    width: 100%;
 }
 
 @keyframes zoomIn {
@@ -744,27 +815,27 @@ kbd {
 
 .game-over h2 {
     color: #ffd700;
-    margin-bottom: 20px;
-    font-size: 2em;
+    margin-bottom: clamp(15px, 2.5vh, 20px);
+    font-size: clamp(1.5em, 3vw, 2em);
     text-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
 }
 
 .game-over p {
-    margin: 10px 0;
-    font-size: 1.1em;
+    margin: clamp(8px, 1.5vh, 10px) 0;
+    font-size: clamp(0.9em, 1.4vw, 1.1em);
 }
 
 .restart-btn {
     background: linear-gradient(45deg, #ffd700, #ffed4e);
     color: #2d3436;
-    padding: 15px 40px;
+    padding: clamp(12px, 2vh, 15px) clamp(30px, 5vw, 40px);
     border: none;
     border-radius: 10px;
-    font-size: 1.2em;
+    font-size: clamp(1em, 1.5vw, 1.2em);
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 20px;
+    margin-top: clamp(15px, 2.5vh, 20px);
     text-transform: uppercase;
 }
 
@@ -776,13 +847,21 @@ kbd {
 /* Instructions */
 #instructions {
     text-align: center;
-    margin-top: 10px;
-    padding: 12px;
+    margin-top: clamp(5px, 1vh, 10px);
+    padding: clamp(8px, 1.5vw, 12px);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
     border-radius: 8px;
-    font-size: 0.9em;
+    font-size: clamp(0.75em, 1.1vw, 0.9em);
     border: 1px solid rgba(255, 255, 255, 0.2);
     flex-shrink: 0;
+}
+
+.desktop-instructions {
+    display: block;
+}
+
+.mobile-instructions {
+    display: none;
 }
 
 /* Efeitos Especiais */
@@ -832,8 +911,8 @@ kbd {
 .shield-active #player::after {
     content: '';
     position: absolute;
-    width: 60px;
-    height: 60px;
+    width: calc(var(--player-size) * 1.5);
+    height: calc(var(--player-size) * 1.5);
     border: 3px solid rgba(135, 206, 235, 0.7);
     border-radius: 50%;
     top: 50%;
@@ -872,58 +951,6 @@ kbd {
         width: 60px;
         height: 60px;
         opacity: 0;
-    }
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    #game-root {
-        padding: 15px;
-        height: 100vh;
-        border-radius: 0;
-    }
-    
-    h1 {
-        font-size: 1.5em;
-    }
-    
-    #game-canvas {
-        height: 350px;
-    }
-    
-    #game-stats {
-        font-size: 0.85em;
-        padding: 10px;
-    }
-    
-    .modal-content {
-        margin: 15px;
-        padding: 20px;
-    }
-    
-    .modal-buttons {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    #inventory-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-    
-    .inventory-item {
-        width: 60px;
-        height: 60px;
-    }
-}
-
-@media (max-width: 480px) {
-    #game-stats {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    #inventory-grid {
-        grid-template-columns: repeat(3, 1fr);
     }
 }
 
@@ -981,4 +1008,453 @@ kbd {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
+}
+
+/* ========================================
+   CONTROLES MOBILE
+   ======================================== */
+
+#mobile-controls {
+    position: fixed;
+    bottom: clamp(10px, 2vh, 20px);
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 clamp(10px, 2vw, 20px);
+    pointer-events: none;
+    z-index: 100;
+}
+
+#mobile-controls.hidden {
+    display: none;
+}
+
+#joystick-container {
+    pointer-events: auto;
+}
+
+#joystick-base {
+    width: clamp(80px, 15vw, 120px);
+    height: clamp(80px, 15vw, 120px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 3px solid rgba(255, 215, 0, 0.5);
+    border-radius: 50%;
+    position: relative;
+    touch-action: none;
+}
+
+#joystick-stick {
+    width: clamp(30px, 5vw, 40px);
+    height: clamp(30px, 5vw, 40px);
+    background: radial-gradient(circle, #ffd700, #ffed4e);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    pointer-events: none;
+}
+
+#mobile-action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: auto;
+}
+
+.mobile-btn {
+    width: clamp(45px, 8vw, 60px);
+    height: clamp(45px, 8vw, 60px);
+    background: rgba(255, 215, 0, 0.2);
+    border: 2px solid #ffd700;
+    border-radius: 50%;
+    font-size: clamp(18px, 3vw, 24px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    transition: all 0.3s ease;
+}
+
+.mobile-btn:active {
+    transform: scale(0.9);
+    background: rgba(255, 215, 0, 0.4);
+}
+
+/* ========================================
+   MODO ACESSIBILIDADE
+   ======================================== */
+
+.accessibility-mode #timer {
+    color: #00ff88;
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.accessibility-mode #timer::after {
+    content: ' (Pausado)';
+    color: #00ff88;
+    text-decoration: none;
+}
+
+/* Indicador de proximidade para acessibilidade */
+.proximity-indicator {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    border-radius: 50%;
+    animation: proximity-pulse 1s infinite;
+}
+
+.proximity-close {
+    border: 3px solid rgba(255, 0, 0, 0.8);
+    animation-duration: 0.5s;
+}
+
+.proximity-medium {
+    border: 3px solid rgba(255, 255, 0, 0.6);
+    animation-duration: 1s;
+}
+
+.proximity-far {
+    border: 3px solid rgba(0, 255, 0, 0.4);
+    animation-duration: 1.5s;
+}
+
+@keyframes proximity-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Feedback visual de direção para acessibilidade */
+.direction-indicator {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 215, 0, 0.8);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    animation: direction-pulse 0.5s infinite;
+    pointer-events: none;
+}
+
+@keyframes direction-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.direction-north {
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%) rotate(0deg);
+}
+
+.direction-south {
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg);
+}
+
+.direction-east {
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.direction-west {
+    left: -40px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+}
+
+/* ========================================
+   RESPONSIVIDADE MELHORADA
+   ======================================== */
+
+/* Smartphones Pequenos (320px - 360px) */
+@media (max-width: 360px) {
+    #game-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    #inventory-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Smartphones Médios (361px - 480px) */
+@media (min-width: 361px) and (max-width: 480px) {
+    #game-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    #inventory-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Smartphones Grandes (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    #game-root {
+        padding: 15px;
+        height: 100vh;
+        border-radius: 0;
+    }
+    
+    h1 {
+        font-size: 1.5em;
+    }
+    
+    #game-canvas {
+        height: 350px;
+    }
+    
+    #game-stats {
+        font-size: 0.85em;
+        padding: 10px;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .modal-content {
+        margin: 15px;
+        padding: 20px;
+    }
+    
+    .modal-buttons {
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    #inventory-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .inventory-item {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    #game-root {
+        padding: 20px;
+    }
+    
+    #game-canvas {
+        height: min(450px, 60vh);
+    }
+    
+    #game-stats {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    
+    #inventory-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* Desktop Médio (1025px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+    :root {
+        --canvas-height: min(500px, 65vh);
+    }
+    
+    #game-stats {
+        display: flex;
+        gap: 15px;
+    }
+}
+
+/* Desktop Grande (1441px - 1920px) */
+@media (min-width: 1441px) and (max-width: 1920px) {
+    :root {
+        --game-max-width: 1200px;
+        --canvas-height: min(600px, 70vh);
+    }
+}
+
+/* Monitores 4K e Ultrawide (> 1920px) */
+@media (min-width: 1921px) {
+    :root {
+        --game-max-width: 1400px;
+        --font-size-base: 18px;
+        --canvas-height: min(700px, 70vh);
+        --player-size: 50px;
+        --news-size: 40px;
+        --powerup-size: 45px;
+        --door-width: 60px;
+        --door-height: 80px;
+    }
+}
+
+/* Modo Paisagem em dispositivos móveis */
+@media (orientation: landscape) and (max-height: 500px) {
+    #game-root {
+        max-height: 100vh;
+        padding: 5px;
+    }
+    
+    h1 {
+        font-size: 1.2em;
+        margin-bottom: 5px;
+    }
+    
+    #game-canvas {
+        height: calc(100vh - 180px);
+    }
+    
+    #game-stats {
+        padding: 5px;
+        font-size: 0.8em;
+    }
+    
+    .password-display {
+        padding: 5px;
+    }
+    
+    #instructions {
+        display: none;
+    }
+}
+
+/* Modo Retrato em Tablets */
+@media (orientation: portrait) and (min-width: 768px) {
+    #game-canvas {
+        height: min(600px, 50vh);
+    }
+}
+
+/* ========================================
+   DETECÇÃO DE CAPACIDADES
+   ======================================== */
+
+/* Dispositivos Touch */
+@media (hover: none) and (pointer: coarse) {
+    .btn,
+    .inventory-item,
+    .news-item,
+    .power-up {
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    #mobile-controls {
+        display: flex !important;
+    }
+    
+    #mobile-controls.hidden {
+        display: none !important;
+    }
+    
+    .mobile-instructions {
+        display: block;
+    }
+    
+    .desktop-instructions {
+        display: none;
+    }
+    
+    #game-canvas {
+        margin-bottom: 150px;
+    }
+}
+
+/* Dispositivos com Mouse */
+@media (hover: hover) and (pointer: fine) {
+    #mobile-controls {
+        display: none !important;
+    }
+}
+
+/* Alto DPI / Retina Displays */
+@media (-webkit-min-device-pixel-ratio: 2), 
+       (min-resolution: 192dpi) {
+    .news-item,
+    .power-up,
+    #player,
+    .door {
+        image-rendering: crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+    }
+}
+
+/* Preferência de Movimento Reduzido */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Teclado Virtual Mobile */
+@media (max-height: 500px) and (max-width: 768px) {
+    .modal-content {
+        max-height: 70vh;
+        padding: 10px;
+    }
+    
+    .modal-buttons {
+        position: sticky;
+        bottom: 0;
+        background: inherit;
+        padding: 10px 0;
+    }
+}
+
+/* Alto Contraste para Acessibilidade */
+.high-contrast {
+    filter: contrast(1.5);
+}
+
+.high-contrast .news-item {
+    border: 3px solid #fff;
+}
+
+.high-contrast .power-up {
+    border: 3px solid #ffd700;
+}
+
+/* ========================================
+   FIXES ESPECÍFICOS PARA NAVEGADORES
+   ======================================== */
+
+/* iOS Safari */
+@supports (-webkit-touch-callout: none) {
+    body {
+        min-height: -webkit-fill-available;
+    }
+    
+    #game-root {
+        height: -webkit-fill-available;
+    }
+    
+    /* Previne zoom em inputs */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Firefox */
+@-moz-document url-prefix() {
+    #game-canvas {
+        image-rendering: -moz-crisp-edges;
+    }
+}
+
+/* Modo Escuro/Claro do Sistema */
+@media (prefers-color-scheme: light) {
+    .modal-content {
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+    }
 }
