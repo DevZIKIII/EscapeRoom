@@ -11,72 +11,90 @@ class AccessibilityManager {
     constructor(game) {
         this.game = game;
         this.enabled = false;
-        this.proximityCheckInterval = null;
-        this.lastProximityState = null;
-        this.directionalSoundInterval = null;
+        this.feedbackInterval = null;
+        this.lastSpokenDirection = null;
+        this.lastSpokenProximity = null;
+
+        this.audioContext = null;
+        this.panner = null;
+        this.proximitySoundNode = null;
         
-        // Sons de proximidade - CONFIGURE SEUS SONS AQUI
         this.sounds = {
             close: document.getElementById('proximity-close-sound'),
             medium: document.getElementById('proximity-medium-sound'),
             far: document.getElementById('proximity-far-sound'),
-            direction: document.getElementById('direction-sound')
         };
         
-        // Configurar volumes
         Object.values(this.sounds).forEach(sound => {
             if (sound) sound.volume = 0.7;
         });
+    }
+
+    initAudioContext() {
+        if (this.audioContext) return;
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.panner = this.audioContext.createStereoPanner();
+            this.panner.connect(this.audioContext.destination);
+        } catch (e) {
+            console.error("Web Audio API não é suportada neste navegador.", e);
+        }
     }
     
     enable() {
         this.enabled = true;
         document.body.classList.add('accessibility-mode');
         document.getElementById('accessibility-indicator').classList.remove('hidden');
+        document.getElementById('route-btn').classList.remove('hidden');
         
-        // Iniciar verificação de proximidade
-        this.startProximityCheck();
+        this.initAudioContext();
+        this.startFeedbackLoop();
         
-        // Anunciar modo ativado
-        this.speak('Modo acessibilidade ativado. O tempo foi pausado. Use os sons para localizar as notícias.');
+        this.speak('Modo acessibilidade ativado. Toque três vezes na tela para calcular a rota.');
     }
     
     disable() {
         this.enabled = false;
         document.body.classList.remove('accessibility-mode');
         document.getElementById('accessibility-indicator').classList.add('hidden');
+        document.getElementById('route-btn').classList.add('hidden');
         
-        // Parar verificações
-        this.stopProximityCheck();
+        this.stopFeedbackLoop();
+        if (this.audioContext && this.audioContext.state !== 'closed') {
+            this.audioContext.close();
+            this.audioContext = null;
+        }
     }
     
-    startProximityCheck() {
-        this.proximityCheckInterval = setInterval(() => {
+    startFeedbackLoop() {
+        this.stopFeedbackLoop();
+        this.feedbackInterval = setInterval(() => {
             if (!this.game.gameRunning || this.game.movementPaused) return;
             
-            const nearestNews = this.findNearestNewsItem();
-            if (nearestNews) {
-                this.handleProximityFeedback(nearestNews);
+            const nearestItem = this.findNearestItem();
+            if (nearestItem) {
+                this.provideContinuousFeedback(nearestItem, 'item');
+            } else {
+                const doorLocation = this.getDoorLocation();
+                this.provideContinuousFeedback(doorLocation, 'door');
             }
-        }, 500); // Verificar a cada 500ms
+        }, 1200);
     }
     
-    stopProximityCheck() {
-        if (this.proximityCheckInterval) {
-            clearInterval(this.proximityCheckInterval);
-            this.proximityCheckInterval = null;
-        }
-        if (this.directionalSoundInterval) {
-            clearInterval(this.directionalSoundInterval);
-            this.directionalSoundInterval = null;
+    stopFeedbackLoop() {
+        if (this.feedbackInterval) {
+            clearInterval(this.feedbackInterval);
+            this.feedbackInterval = null;
         }
     }
     
-    findNearestNewsItem() {
+    findNearestItem() {
         let nearest = null;
         let minDistance = Infinity;
         
-        this.game.newsItems.forEach(item => {
+        const allItems = [...this.game.newsItems, ...this.game.powerUps];
+
+        allItems.forEach(item => {
             if (item.collected) return;
             
             const itemPixelX = (item.xPercent / 100) * this.game.canvas.offsetWidth;
@@ -89,117 +107,146 @@ class AccessibilityManager {
             
             if (distance < minDistance) {
                 minDistance = distance;
-                nearest = { item, distance, x: itemPixelX, y: itemPixelY };
+                nearest = { x: itemPixelX, y: itemPixelY, distance: distance, item: item };
             }
         });
         
         return nearest;
     }
     
-    handleProximityFeedback(nearestNews) {
-        const { distance, x, y } = nearestNews;
-        let proximityState;
+    getDoorLocation() {
+        const doorRect = this.game.door.getBoundingClientRect();
+        const canvasRect = this.game.canvas.getBoundingClientRect();
+
+        const doorX = (doorRect.left - canvasRect.left) + (doorRect.width / 2);
+        const doorY = (doorRect.top - canvasRect.top) + (doorRect.height / 2);
         
-        // Definir estado de proximidade
-        if (distance < 50) {
-            proximityState = 'close';
-        } else if (distance < 150) {
-            proximityState = 'medium';
-        } else if (distance < 250) {
-            proximityState = 'far';
-        } else {
-            proximityState = 'none';
-        }
-        
-        // Tocar som se mudou de estado
-        if (proximityState !== this.lastProximityState && proximityState !== 'none') {
-            this.playProximitySound(proximityState);
-            
-            // Adicionar indicador visual (opcional)
-            this.showProximityIndicator(nearestNews.item.element, proximityState);
-            
-            // Calcular direção
-            this.provideDirectionalFeedback(x, y);
-        }
-        
-        this.lastProximityState = proximityState;
+        const distance = Math.sqrt(
+            Math.pow(this.game.player.x - doorX, 2) +
+            Math.pow(this.game.player.y - doorY, 2)
+        );
+
+        return { x: doorX, y: doorY, distance: distance };
     }
-    
-    playProximitySound(state) {
+
+    provideContinuousFeedback(target, targetType) {
+        const { distance, x, y } = target;
+        let proximityState;
+        let proximityText;
+        
+        if (distance < 60) {
+            proximityState = 'close';
+            proximityText = 'muito perto';
+        } else if (distance < 180) {
+            proximityState = 'medium';
+            proximityText = 'perto';
+        } else {
+            proximityState = 'far';
+            proximityText = 'longe';
+        }
+        
+        const dx = x - this.game.player.x;
+        
+        this.playProximitySound(proximityState, dx);
+        
+        const directionText = this.getSimpleDirection(dx, y - this.game.player.y);
+        
+        let objectName = 'Item';
+        if (targetType === 'door') {
+            objectName = 'A porta';
+        } else if (target.item && target.item.questionData) {
+            objectName = 'Notícia';
+        }
+
+        if (directionText !== this.lastSpokenDirection || proximityText !== this.lastSpokenProximity) {
+            this.speak(`${objectName} ${proximityText}, ${directionText}`);
+            this.lastSpokenDirection = directionText;
+            this.lastSpokenProximity = proximityText;
+        }
+    }
+
+    playProximitySound(state, dx) {
+        if (!this.audioContext || !this.game.soundManager.enabled) return;
+        
         const sound = this.sounds[state];
-        if (sound && this.game.soundManager.enabled) {
+        if (sound) {
+            if (!this.proximitySoundNode || this.proximitySoundNode.mediaElement !== sound) {
+                this.proximitySoundNode = this.audioContext.createMediaElementSource(sound);
+                this.proximitySoundNode.connect(this.panner);
+            }
+
+            const panValue = dx / (this.game.canvas.offsetWidth / 2);
+            this.panner.pan.setValueAtTime(Math.max(-1, Math.min(1, panValue)), this.audioContext.currentTime);
+
             sound.currentTime = 0;
             sound.play().catch(e => console.log('Som de proximidade não disponível'));
         }
     }
+
+    getSimpleDirection(dx, dy) {
+        const parts = [];
+        const threshold = 20;
+
+        if (Math.abs(dy) > threshold) {
+            parts.push(dy < 0 ? 'para cima' : 'para baixo');
+        }
+        if (Math.abs(dx) > threshold) {
+            parts.push(dx > 0 ? 'para a direita' : 'para a esquerda');
+        }
+
+        if (parts.length === 0) {
+            return "bem em frente";
+        }
+        return parts.join(' e ');
+    }
     
-    provideDirectionalFeedback(targetX, targetY) {
-        const dx = targetX - this.game.player.x;
-        const dy = targetY - this.game.player.y;
-        
-        // Calcular direção
-        let direction = '';
-        if (Math.abs(dx) > Math.abs(dy)) {
-            direction = dx > 0 ? 'direita' : 'esquerda';
+    provideRouteToNearestItem() {
+        let target, targetType, targetName;
+
+        const nearestItem = this.findNearestItem();
+        if (nearestItem) {
+            target = nearestItem;
+            targetType = 'item';
+            targetName = nearestItem.item.questionData ? 'notícia' : 'item';
         } else {
-            direction = dy > 0 ? 'baixo' : 'cima';
+            target = this.getDoorLocation();
+            targetType = 'door';
+            targetName = 'porta';
         }
         
-        // Feedback por voz (usando API de síntese de voz)
-        if (this.lastProximityState === 'close') {
-            this.speak(`Notícia muito próxima à ${direction}`);
-        } else if (this.lastProximityState === 'medium') {
-            this.speak(`Notícia à ${direction}`);
+        const dx = target.x - this.game.player.x;
+        const dy = target.y - this.game.player.y;
+
+        const stepSize = 40;
+        const horizontalSteps = Math.round(Math.abs(dx) / stepSize);
+        const verticalSteps = Math.round(Math.abs(dy) / stepSize);
+        
+        let instructions = `Para a ${targetName} mais próxima: `;
+        const parts = [];
+
+        if (horizontalSteps > 0) {
+            const direction = dx > 0 ? 'direita' : 'esquerda';
+            parts.push(`mova ${horizontalSteps} ${horizontalSteps > 1 ? 'passos' : 'passo'} para a ${direction}`);
+        }
+        if (verticalSteps > 0) {
+            const direction = dy < 0 ? 'cima' : 'baixo';
+            parts.push(`mova ${verticalSteps} ${verticalSteps > 1 ? 'passos' : 'passo'} para ${direction}`);
         }
         
-        // Indicador visual de direção
-        this.showDirectionIndicator(direction);
-    }
-    
-    showProximityIndicator(element, state) {
-        // Remover indicadores anteriores
-        element.querySelectorAll('.proximity-indicator').forEach(el => el.remove());
-        
-        const indicator = document.createElement('div');
-        indicator.className = `proximity-indicator proximity-${state}`;
-        element.appendChild(indicator);
-        
-        setTimeout(() => indicator.remove(), 1000);
-    }
-    
-    showDirectionIndicator(direction) {
-        const player = this.game.player.element;
-        
-        // Remover indicadores anteriores
-        player.querySelectorAll('.direction-indicator').forEach(el => el.remove());
-        
-        const indicator = document.createElement('div');
-        indicator.className = 'direction-indicator';
-        
-        switch(direction) {
-            case 'cima':
-                indicator.classList.add('direction-north');
-                break;
-            case 'baixo':
-                indicator.classList.add('direction-south');
-                break;
-            case 'direita':
-                indicator.classList.add('direction-east');
-                break;
-            case 'esquerda':
-                indicator.classList.add('direction-west');
-                break;
+        if (parts.length === 0) {
+            instructions += "está bem na sua frente.";
+        } else {
+            instructions += parts.join(', e depois, ');
         }
-        
-        player.appendChild(indicator);
-        setTimeout(() => indicator.remove(), 1000);
+        this.speak(instructions);
     }
     
     speak(text) {
         if ('speechSynthesis' in window) {
+            speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'pt-BR';
-            utterance.rate = 1.2;
+            utterance.rate = 1.3;
             speechSynthesis.speak(utterance);
         }
     }
@@ -241,12 +288,10 @@ class MobileControls {
     }
     
     setupControls() {
-        // Joystick
         this.joystickBase.addEventListener('touchstart', (e) => this.handleJoystickStart(e), { passive: false });
         this.joystickBase.addEventListener('touchmove', (e) => this.handleJoystickMove(e), { passive: false });
         this.joystickBase.addEventListener('touchend', (e) => this.handleJoystickEnd(e), { passive: false });
         
-        // Botões de ação
         document.getElementById('mobile-mochila')?.addEventListener('touchstart', (e) => {
             e.preventDefault();
             this.game.openInventory();
@@ -274,25 +319,21 @@ class MobileControls {
         if (!this.isActive) return;
         
         const touch = e.touches[0];
-        const maxDistance = 40; // Raio máximo do joystick
+        const maxDistance = 40;
         
         let deltaX = touch.clientX - this.joystickData.startX;
         let deltaY = touch.clientY - this.joystickData.startY;
         
-        // Calcular distância e ângulo
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         const angle = Math.atan2(deltaY, deltaX);
         
-        // Limitar ao raio máximo
         if (distance > maxDistance) {
             deltaX = Math.cos(angle) * maxDistance;
             deltaY = Math.sin(angle) * maxDistance;
         }
         
-        // Atualizar posição visual do stick
         this.joystickStick.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
         
-        // Converter para movimento do jogador
         this.updatePlayerMovement(deltaX, deltaY, maxDistance);
     }
     
@@ -300,10 +341,8 @@ class MobileControls {
         e.preventDefault();
         this.isActive = false;
         
-        // Resetar joystick visual
         this.joystickStick.style.transform = 'translate(-50%, -50%)';
         
-        // Parar movimento
         this.game.keys.left = false;
         this.game.keys.right = false;
         this.game.keys.up = false;
@@ -311,15 +350,13 @@ class MobileControls {
     }
     
     updatePlayerMovement(deltaX, deltaY, maxDistance) {
-        const threshold = maxDistance * 0.3; // 30% do raio para ativar movimento
+        const threshold = maxDistance * 0.3;
         
-        // Reset keys
         this.game.keys.left = false;
         this.game.keys.right = false;
         this.game.keys.up = false;
         this.game.keys.down = false;
         
-        // Movimento horizontal
         if (Math.abs(deltaX) > threshold) {
             if (deltaX > 0) {
                 this.game.keys.right = true;
@@ -328,7 +365,6 @@ class MobileControls {
             }
         }
         
-        // Movimento vertical
         if (Math.abs(deltaY) > threshold) {
             if (deltaY > 0) {
                 this.game.keys.down = true;
@@ -352,7 +388,6 @@ class SoundManager {
             background: document.getElementById('background-music')
         };
         
-        // Configurações de volume
         if (this.sounds.background) {
             this.sounds.background.volume = 0.3;
         }
@@ -364,7 +399,6 @@ class SoundManager {
             audio.volume = 0.5;
             return audio;
         }
-        // Cria um áudio simulado se não existir o elemento
         return {
             play: () => Promise.resolve(),
             pause: () => {},
@@ -437,7 +471,6 @@ class Inventory {
                 game.showFeedback('⏰ +30 segundos adicionados!', 'correct');
                 break;
             case 'hint':
-                // Será usado no modal de perguntas
                 game.showFeedback('💡 Dica ativada! Use no próximo desafio.', 'correct');
                 break;
             case 'shield':
@@ -497,7 +530,6 @@ class Inventory {
     }
 }
 
-// Função para embaralhar arrays (Fisher-Yates)
 function shuffleArray(array) {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -507,22 +539,18 @@ function shuffleArray(array) {
     return newArray;
 }
 
-// Importar salas
 import rooms from './rooms.js';
 
-// Classe Principal do Jogo
 class EscapeRoomGame {
     constructor() {
         window.currentGame = this;
         
-        // Player
         this.player = {
             x: 40,
             y: 40,
             element: document.getElementById('player'),
         };
         
-        // Configurações do jogo
         this.shuffledRooms = shuffleArray([...rooms]);
         this.currentRoomIndex = 0;
         this.maxRooms = this.shuffledRooms.length;
@@ -536,13 +564,9 @@ class EscapeRoomGame {
         this.newsItems = [];
         this.powerUps = [];
         
-        // Sistema de som
         this.soundManager = new SoundManager();
-        
-        // Sistema de inventário
         this.inventory = new Inventory();
         
-        // Estatísticas
         this.correctStreak = 0;
         this.wrongStreak = 0;
         this.movementPaused = false;
@@ -554,12 +578,10 @@ class EscapeRoomGame {
         this.accessibilityManager = new AccessibilityManager(this);
         this.mobileControls = new MobileControls(this);
         
-        // Elementos DOM
         this.h1Title = document.getElementById('room-title');
         this.canvas = document.getElementById('game-canvas');
         this.door = document.getElementById('door');
         
-        // Controles
         this.keys = {
             left: false,
             right: false,
@@ -568,6 +590,10 @@ class EscapeRoomGame {
         };
         
         this.lastDirection = null;
+
+        // --- NOVO: Variáveis para detectar toque triplo ---
+        this.tapCount = 0;
+        this.lastTapTime = 0;
         
         this.init();
     }
@@ -596,7 +622,6 @@ class EscapeRoomGame {
         });
     }
 
-    
     startGame() {
         this.gameRunning = true;
         this.initializeRoom();
@@ -615,13 +640,11 @@ class EscapeRoomGame {
             });
         } catch (error) {
             console.error('Erro ao carregar dados das salas:', error);
-            // Usar dados default se falhar
             this.roomData = this.getDefaultQuestions();
         }
     }
     
     getDefaultQuestions() {
-        // Retorna perguntas padrão caso o arquivo JSON não carregue
         return {
             room1: [
                 {
@@ -647,7 +670,6 @@ class EscapeRoomGame {
         document.getElementById('room-info').textContent = roomName;
         document.getElementById('high-score').textContent = `Recorde: ${getLocalHighScore()}`;
         
-        // Atualizar barra de dificuldade
         const progress = ((this.currentRoomIndex + 1) / this.maxRooms) * 100;
         document.querySelector('.difficulty-fill').style.width = `${progress}%`;
         document.getElementById('difficulty-level').textContent = `Nível ${this.currentRoomIndex + 1}/${this.maxRooms}`;
@@ -662,7 +684,6 @@ class EscapeRoomGame {
         this.updateRoomInfo();
         this.resetPlayerPosition();
         
-        // Aumentar dificuldade progressiva
         if (this.currentRoomIndex > 0) {
             const difficultyMultiplier = 1 + (this.currentRoomIndex * 0.1);
             this.playerSpeed = Math.max(3, 4 / difficultyMultiplier);
@@ -677,30 +698,55 @@ class EscapeRoomGame {
     }
     
     setupEventListeners() {
-        // Controles de movimento
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('keyup', (e) => this.handleKeyUp(e));
         
-        // Botões do modal
+        // --- NOVO: Listener de toque para o gesto de toque triplo ---
+        this.canvas.addEventListener('touchend', (e) => this.handleTripleTap(e));
+        
         document.getElementById('fake-btn').addEventListener('click', () => this.answerQuestion(true));
         document.getElementById('real-btn').addEventListener('click', () => this.answerQuestion(false));
         document.getElementById('use-hint-btn').addEventListener('click', () => this.useHint());
         
-        // Porta
         this.door.addEventListener('click', () => this.tryOpenDoor());
         
-        // Botão de pause
         document.getElementById('pause-btn')?.addEventListener('click', () => this.togglePause());
         
-        // Botão de som
         document.getElementById('sound-btn')?.addEventListener('click', () => {
             const enabled = this.soundManager.toggle();
             document.getElementById('sound-btn').textContent = enabled ? '🔊 Som' : '🔇 Som';
         });
+
+        document.getElementById('route-btn')?.addEventListener('click', () => {
+            if (this.accessibilityMode) {
+                this.accessibilityManager.provideRouteToNearestItem();
+            }
+        });
         
-        // Mochila
         document.getElementById('mochila-btn')?.addEventListener('click', () => this.openInventory());
         document.getElementById('close-mochila')?.addEventListener('click', () => this.closeInventory());
+    }
+    
+    // --- NOVA FUNÇÃO: Lógica para detectar o toque triplo ---
+    handleTripleTap(e) {
+        if (!this.accessibilityMode) return;
+
+        const currentTime = new Date().getTime();
+        const timeSinceLastTap = currentTime - this.lastTapTime;
+
+        if (timeSinceLastTap < 500) { // Toques devem ser rápidos
+            this.tapCount++;
+        } else {
+            this.tapCount = 1;
+        }
+
+        this.lastTapTime = currentTime;
+
+        if (this.tapCount === 3) {
+            e.preventDefault();
+            this.accessibilityManager.provideRouteToNearestItem();
+            this.tapCount = 0; // Reseta a contagem
+        }
     }
     
     handleKeyDown(e) {
@@ -734,6 +780,11 @@ class EscapeRoomGame {
             case 'b':
                 this.openInventory();
                 break;
+            case 'h':
+                if (this.accessibilityMode) {
+                    this.accessibilityManager.provideRouteToNearestItem();
+                }
+                break;
         }
     }
     
@@ -765,7 +816,6 @@ class EscapeRoomGame {
         let moved = false;
         const playerEl = this.player.element;
         
-        // Remover classes de direção antigas
         playerEl.classList.remove('moving-left', 'moving-right', 'moving-up', 'moving-down');
         
         if (this.keys.left && this.player.x > 5) {
@@ -793,7 +843,6 @@ class EscapeRoomGame {
             playerEl.style.left = this.player.x + 'px';
             playerEl.style.top = this.player.y + 'px';
             
-            // Criar partículas de movimento
             if (Math.random() < 0.1) {
                 this.createParticle(this.player.x + 20, this.player.y + 20);
             }
@@ -871,7 +920,6 @@ class EscapeRoomGame {
         container.innerHTML = '';
         this.powerUps = [];
         
-        // Spawnar 1-2 power-ups aleatórios por sala
         const numPowerUps = Math.floor(Math.random() * 2) + 1;
         const powerUpTypes = ['time', 'hint', 'shield', 'speed', 'radar'];
         
@@ -907,56 +955,33 @@ class EscapeRoomGame {
     
     checkCollisions() {
         if (this.movementPaused) return;
-        // Colisão com notícias
+        
         this.newsItems.forEach((item, index) => {
             if (item.collected) return;
-            
-            const playerWidth = 40;
-            const playerHeight = 40;
-            const itemWidth = 30;
-            const itemHeight = 30;
             
             const itemPixelX = (item.xPercent / 100) * this.canvas.offsetWidth;
             const itemPixelY = (item.yPercent / 100) * this.canvas.offsetHeight;
             
-            const playerCenterX = this.player.x + playerWidth / 2;
-            const playerCenterY = this.player.y + playerHeight / 2;
-            
-            const itemCenterX = itemPixelX + itemWidth / 2;
-            const itemCenterY = itemPixelY + itemHeight / 2;
-            
             const distance = Math.sqrt(
-                Math.pow(playerCenterX - itemCenterX, 2) +
-                Math.pow(playerCenterY - itemCenterY, 2)
+                Math.pow(this.player.x + 20 - (itemPixelX + 15), 2) +
+                Math.pow(this.player.y + 20 - (itemPixelY + 15), 2)
             );
             
-            const collisionThreshold = (playerWidth / 2) + (itemWidth / 2);
-            
-            if (distance < collisionThreshold) {
+            if (distance < 30) {
                 this.soundManager.play('collect');
                 this.showNewsModal(item.questionData, index);
             }
         });
         
-        // Colisão com power-ups
         this.powerUps.forEach((powerUp, index) => {
             if (powerUp.collected) return;
-            
-            const playerWidth = 40;
-            const powerUpWidth = 35;
             
             const powerUpPixelX = (powerUp.xPercent / 100) * this.canvas.offsetWidth;
             const powerUpPixelY = (powerUp.yPercent / 100) * this.canvas.offsetHeight;
             
-            const playerCenterX = this.player.x + playerWidth / 2;
-            const playerCenterY = this.player.y + playerWidth / 2;
-            
-            const powerUpCenterX = powerUpPixelX + powerUpWidth / 2;
-            const powerUpCenterY = powerUpPixelY + powerUpWidth / 2;
-            
             const distance = Math.sqrt(
-                Math.pow(playerCenterX - powerUpCenterX, 2) +
-                Math.pow(playerCenterY - powerUpCenterY, 2)
+                Math.pow(this.player.x + 20 - (powerUpPixelX + 17), 2) +
+                Math.pow(this.player.y + 20 - (powerUpPixelY + 17), 2)
             );
             
             if (distance < 30) {
@@ -976,48 +1001,23 @@ class EscapeRoomGame {
     }
     
     showNewsModal(questionData, itemIndex) {
-    this.currentQuestionIndex = itemIndex;
-    this.currentQuestion = questionData;
-    
-    document.getElementById('modal-news').textContent = questionData.text;
-    document.getElementById('modal').classList.remove('hidden');
-    this.movementPaused = true;
-    
-    // Verificar se tem item de dica
-    const hintBtn = document.getElementById('use-hint-btn');
-    if (this.inventory.items.hint > 0) {
-        hintBtn.style.display = 'inline-block';
-    } else {
-        hintBtn.style.display = 'none';
+        this.currentQuestionIndex = itemIndex;
+        this.currentQuestion = questionData;
+        
+        document.getElementById('modal-news').textContent = questionData.text;
+        document.getElementById('modal').classList.remove('hidden');
+        this.movementPaused = true;
+        
+        const hintBtn = document.getElementById('use-hint-btn');
+        if (this.inventory.items.hint > 0) {
+            hintBtn.style.display = 'inline-block';
+        } else {
+            hintBtn.style.display = 'none';
+        }
+        
+        document.getElementById('hint-section').classList.add('hidden');
+        document.getElementById('hint-content').textContent = '';
     }
-    
-    // Resetar seção de dica
-    document.getElementById('hint-section').classList.add('hidden');
-    // ✨ LINHA ADICIONADA PARA A CORREÇÃO ✨
-    document.getElementById('hint-content').textContent = ''; 
-}
-    // CÓDIGO CORRIGIDO
-
-showNewsModal(questionData, itemIndex) {
-    this.currentQuestionIndex = itemIndex;
-    this.currentQuestion = questionData;
-    
-    document.getElementById('modal-news').textContent = questionData.text;
-    document.getElementById('modal').classList.remove('hidden');
-    this.movementPaused = true;
-    
-    // Verificar se tem item de dica
-    const hintBtn = document.getElementById('use-hint-btn');
-    if (this.inventory.items.hint > 0) {
-        hintBtn.style.display = 'inline-block';
-    } else {
-        hintBtn.style.display = 'none';
-    }
-    
-    // Resetar seção de dica
-    document.getElementById('hint-section').classList.add('hidden');
-    document.getElementById('hint-content').textContent = ''; // <-- ADICIONE ESTA LINHA
-}
 
     useHint() {
         if (this.inventory.items.hint > 0 && this.currentQuestion) {
@@ -1047,7 +1047,6 @@ showNewsModal(questionData, itemIndex) {
             this.correctStreak++;
             this.wrongStreak = 0;
             
-            // Sistema de bônus por streak
             let bonus = 0;
             const streakBonuses = [3, 5, 7, 10, 12, 15, 20, 25, 30, 40, 50];
             if (streakBonuses.includes(this.correctStreak)) {
@@ -1063,13 +1062,11 @@ showNewsModal(questionData, itemIndex) {
                     'correct'
                 );
             }
-        } else { // Se a resposta estiver INCORRETA
+        } else {
             this.soundManager.play('wrong');
             this.wrongStreak++;
     
-            // Aplicar penalidade ou usar escudo
             if (this.shieldActive) {
-                // Se o escudo estiver ativo, ele apenas é consumido
                 this.shieldActive = false;
                 document.getElementById('game-canvas').classList.remove('shield-active');
                 this.showFeedback(
@@ -1077,8 +1074,7 @@ showNewsModal(questionData, itemIndex) {
                     'incorrect'
                 );
             } else {
-                // Se não tiver escudo, aplica a penalidade E zera a sequência
-                this.correctStreak = 0; // <-- CORREÇÃO: Movido para cá
+                this.correctStreak = 0;
         
                 const penalty = Math.min(this.wrongStreak * 5, 20);
                 this.timeLeft = Math.max(0, this.timeLeft - penalty);
@@ -1218,7 +1214,6 @@ showNewsModal(questionData, itemIndex) {
         this.timerInterval = setInterval(() => {
             if (!this.gameRunning) return;
             
-            // NÃO DECREMENTAR TEMPO NO MODO ACESSIBILIDADE
             if (!this.accessibilityMode) {
                 this.timeLeft--;
             }
@@ -1229,7 +1224,6 @@ showNewsModal(questionData, itemIndex) {
             
             timerEl.textContent = `Tempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
-            // Alerta visual quando tempo está acabando (apenas modo normal)
             if (!this.accessibilityMode) {
                 if (this.timeLeft <= 60) {
                     timerEl.style.color = '#ff6b6b';
@@ -1268,13 +1262,11 @@ showNewsModal(questionData, itemIndex) {
         clearInterval(this.timerInterval);
         this.soundManager.sounds.background?.pause();
         
-        // Bônus por tempo restante
         let timeBonus = Math.floor(this.timeLeft / 2);
         if (timeBonus > 0) {
             this.score += timeBonus;
         }
         
-        // Verificar recorde
         const previousHighScore = getLocalHighScore();
         let rankingMsg = '';
         if (this.score > previousHighScore) {
@@ -1309,7 +1301,6 @@ showNewsModal(questionData, itemIndex) {
     }
 }
 
-// Exportar função para iniciar o jogo
 export function startGame() {
     new EscapeRoomGame();
 }

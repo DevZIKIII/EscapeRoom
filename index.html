@@ -8,7 +8,6 @@
     <script type="module" src="js/main.js"></script>
 </head>
 <body>
-    <!-- Tutorial Modal -->
     <div id="tutorial-modal" class="modal">
         <div class="modal-content tutorial">
             <h2>🕵️ Como Jogar - Caçador de Fake News</h2>
@@ -36,7 +35,7 @@
                 <p>Acumule pontos com sequências de acertos e ganhe bônus especiais!</p>
                 
                 <h3>♿ Modo Acessibilidade</h3>
-                <p>Ative o modo acessibilidade para jogar com feedback sonoro. O tempo será pausado e você receberá sinais de áudio para localizar as notícias.</p>
+                <p>Ative para jogar com feedback sonoro contínuo. O tempo será pausado. Pressione <kbd>H</kbd> ou **dê um toque triplo na tela** para receber a rota até o item mais próximo.</p>
                 
                 <div class="mode-selection">
                     <button id="normal-mode-btn" class="btn start">🎮 Modo Normal</button>
@@ -52,6 +51,7 @@
             <button id="pause-btn" class="btn" style="margin-bottom: 8px;">⏸️ Pausar</button>
             <button id="mochila-btn" class="btn" style="margin-bottom: 8px;">💼 Mochila</button>
             <button id="sound-btn" class="btn" style="margin-bottom: 8px;">🔊 Som</button>
+            <button id="route-btn" class="btn hidden" style="margin-bottom: 8px;">🗺️ Rota</button>
             <div id="high-score">Recorde: 0</div>
             <div id="score">Pontos: 0</div>
             <div id="timer">Tempo: 10:00</div>
@@ -60,7 +60,6 @@
             <div id="accessibility-indicator" class="hidden">♿ Modo Acessibilidade Ativo</div>
         </div>
         
-        <!-- Barra de Dificuldade -->
         <div id="difficulty-bar">
             <span>Dificuldade:</span>
             <div class="difficulty-progress">
@@ -75,17 +74,14 @@
             <p id="password-hint">Encontre notícias e responda corretamente para descobrir os números!</p>
         </div>
         
-        <!-- Canvas do Jogo -->
         <div id="game-canvas">
             <div id="player"></div>
             <div id="news-items"></div>
             <div id="power-ups"></div>
             <div class="door" id="door"></div>
-            <!-- Indicador de Movimento -->
             <div id="movement-indicator"></div>
         </div>
         
-        <!-- Controles Mobile -->
         <div id="mobile-controls" class="hidden">
             <div id="joystick-container">
                 <div id="joystick-base">
@@ -98,7 +94,6 @@
             </div>
         </div>
         
-        <!-- Modal de Notícias -->
         <div id="modal" class="modal hidden">
             <div class="modal-content">
                 <h3 id="modal-title">Notícia Encontrada!</h3>
@@ -114,29 +109,24 @@
             </div>
         </div>
         
-        <!-- Modal da Mochila -->
         <div id="mochila-modal" class="modal hidden">
             <div class="modal-content mochila">
                 <h3>💼 Sua Mochila</h3>
                 <div id="inventory-grid">
-                    <!-- Items serão adicionados dinamicamente -->
-                </div>
+                    </div>
                 <p class="mochila-tip">Clique em um item para usá-lo</p>
                 <button id="close-mochila" class="btn">Fechar</button>
             </div>
         </div>
         
-        <!-- Instruções -->
         <div id="instructions">
             <p class="desktop-instructions">Use as setas ⬅️➡️⬆️⬇️ para mover | Pressione <kbd>B</kbd> para abrir a mochila | Colete power-ups dourados!</p>
             <p class="mobile-instructions hidden">Use o joystick para mover | Toque em 💼 para mochila | Colete power-ups dourados!</p>
         </div>
         
-        <!-- Efeitos Visuais -->
         <div id="effects-container"></div>
     </div>
     
-    <!-- Sistema de Som -->
     <audio id="collect-sound" preload="auto">
         <source src="sounds/collect.mp3" type="audio/mpeg">
     </audio>
@@ -156,21 +146,16 @@
         <source src="sounds/background.mp3" type="audio/mpeg">
     </audio>
     
-    <!-- Sons de Acessibilidade - ADICIONE SEUS SONS AQUI -->
     <audio id="proximity-close-sound" preload="auto">
-        <!-- Coloque aqui o som para quando está próximo de uma notícia -->
         <source src="sounds/proximity-close.mp3" type="audio/mpeg">
     </audio>
     <audio id="proximity-medium-sound" preload="auto">
-        <!-- Coloque aqui o som para quando está a média distância -->
         <source src="sounds/proximity-medium.mp3" type="audio/mpeg">
     </audio>
     <audio id="proximity-far-sound" preload="auto">
-        <!-- Coloque aqui o som para quando está longe -->
         <source src="sounds/proximity-far.mp3" type="audio/mpeg">
     </audio>
     <audio id="direction-sound" preload="auto">
-        <!-- Coloque aqui o som direcional -->
         <source src="sounds/direction.mp3" type="audio/mpeg">
     </audio>
 </body>
