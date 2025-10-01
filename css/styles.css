@@ -1176,90 +1176,336 @@ kbd {
 
 /* Smartphones Pequenos (320px - 360px) */
 @media (max-width: 360px) {
+    :root {
+        --canvas-height: clamp(200px, 40vh, 300px);
+        --player-size: 28px;
+        --news-size: 22px;
+        --powerup-size: 25px;
+    }
+
+    #game-root {
+        padding: 8px;
+        border-radius: 0;
+    }
+
+    h1 {
+        font-size: 1.2em;
+        margin-bottom: 8px;
+    }
+
     #game-stats {
         grid-template-columns: repeat(2, 1fr);
+        padding: 6px 8px;
+        font-size: 0.75em;
+        gap: 5px;
     }
-    
+
+    #game-stats > div,
+    #game-stats > button {
+        padding: 4px 6px;
+        font-size: 0.7em;
+    }
+
+    #difficulty-bar {
+        font-size: 0.7em;
+        padding: 5px 8px;
+    }
+
+    .password-display {
+        padding: 6px;
+    }
+
+    .password-display p {
+        font-size: 0.75em;
+    }
+
+    #password-digits {
+        font-size: 1.3em;
+        margin: 5px 0;
+    }
+
+    #game-canvas {
+        min-height: 200px;
+    }
+
     #inventory-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 8px;
     }
-    
+
+    .inventory-item {
+        min-width: 45px;
+        max-width: 55px;
+    }
+
     .modal-buttons {
         flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-content {
+        padding: 15px;
+        margin: 10px;
+    }
+
+    .modal-content h2,
+    .modal-content h3 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+
+    .modal-content p {
+        font-size: 0.85em;
+        padding: 8px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.8em;
+    }
+
+    #instructions {
+        font-size: 0.7em;
+        padding: 6px;
+    }
+
+    #joystick-base {
+        width: 70px;
+        height: 70px;
+    }
+
+    #joystick-stick {
+        width: 28px;
+        height: 28px;
+    }
+
+    .mobile-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
     }
 }
 
 /* Smartphones Médios (361px - 480px) */
 @media (min-width: 361px) and (max-width: 480px) {
+    :root {
+        --canvas-height: clamp(250px, 45vh, 350px);
+        --player-size: 32px;
+        --news-size: 26px;
+        --powerup-size: 30px;
+    }
+
+    #game-root {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    h1 {
+        font-size: 1.4em;
+        margin-bottom: 10px;
+    }
+
     #game-stats {
         grid-template-columns: repeat(3, 1fr);
+        font-size: 0.8em;
+        padding: 8px 10px;
     }
-    
+
+    #game-stats > div,
+    #game-stats > button {
+        padding: 5px 8px;
+    }
+
+    #game-canvas {
+        min-height: 250px;
+    }
+
     #inventory-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+
+    .inventory-item {
+        min-width: 50px;
+        max-width: 65px;
+    }
+
+    .modal-content {
+        padding: 20px;
+        margin: 15px;
+    }
+
+    .modal-buttons {
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        font-size: 0.85em;
+    }
+
+    #instructions {
+        font-size: 0.75em;
+        padding: 8px;
     }
 }
 
 /* Smartphones Grandes (481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
+    :root {
+        --canvas-height: clamp(300px, 50vh, 400px);
+        --player-size: 36px;
+        --news-size: 28px;
+        --powerup-size: 32px;
+    }
+
     #game-root {
         padding: 15px;
         height: 100vh;
         border-radius: 0;
     }
-    
+
     h1 {
         font-size: 1.5em;
+        margin-bottom: 12px;
     }
-    
+
     #game-canvas {
         height: 350px;
+        min-height: 300px;
     }
-    
+
     #game-stats {
         font-size: 0.85em;
         padding: 10px;
         grid-template-columns: repeat(4, 1fr);
     }
-    
+
+    #game-stats > div,
+    #game-stats > button {
+        padding: 6px 10px;
+    }
+
+    #difficulty-bar {
+        font-size: 0.85em;
+    }
+
+    .password-display {
+        padding: 10px;
+    }
+
     .modal-content {
         margin: 15px;
         padding: 20px;
     }
-    
+
     .modal-buttons {
         flex-direction: row;
         gap: 10px;
     }
-    
+
     #inventory-grid {
         grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
     }
-    
+
     .inventory-item {
-        width: 60px;
-        height: 60px;
+        min-width: 60px;
+        max-width: 70px;
+    }
+
+    .btn {
+        padding: 11px 20px;
+        font-size: 0.9em;
+    }
+
+    #instructions {
+        font-size: 0.8em;
+        padding: 10px;
+    }
+
+    #joystick-base {
+        width: 100px;
+        height: 100px;
+    }
+
+    #joystick-stick {
+        width: 35px;
+        height: 35px;
+    }
+
+    .mobile-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
     }
 }
 
 /* Tablets (769px - 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
+    :root {
+        --canvas-height: min(450px, 60vh);
+        --player-size: 38px;
+        --news-size: 30px;
+        --powerup-size: 34px;
+    }
+
     #game-root {
         padding: 20px;
+        border-radius: 12px;
     }
-    
+
+    h1 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+    }
+
     #game-canvas {
         height: min(450px, 60vh);
+        min-height: 350px;
     }
-    
+
     #game-stats {
         display: flex;
         justify-content: space-between;
         flex-wrap: wrap;
+        font-size: 0.9em;
+        padding: 12px 15px;
     }
-    
+
+    #game-stats > div,
+    #game-stats > button {
+        padding: 6px 12px;
+    }
+
+    .password-display {
+        padding: 12px;
+    }
+
     #inventory-grid {
         grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+    }
+
+    .inventory-item {
+        min-width: 70px;
+        max-width: 85px;
+    }
+
+    .modal-content {
+        padding: 25px;
+        margin: 20px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        font-size: 0.95em;
+    }
+
+    #instructions {
+        font-size: 0.85em;
+        padding: 12px;
     }
 }
 
@@ -1299,38 +1545,139 @@ kbd {
 
 /* Modo Paisagem em dispositivos móveis */
 @media (orientation: landscape) and (max-height: 500px) {
+    :root {
+        --canvas-height: calc(100vh - 200px);
+        --player-size: 30px;
+        --news-size: 24px;
+        --powerup-size: 28px;
+    }
+
     #game-root {
         max-height: 100vh;
         padding: 5px;
+        border-radius: 0;
     }
-    
+
     h1 {
         font-size: 1.2em;
         margin-bottom: 5px;
+        line-height: 1;
     }
-    
+
     #game-canvas {
-        height: calc(100vh - 180px);
+        height: calc(100vh - 200px);
+        min-height: 150px;
+        flex: 1;
     }
-    
+
     #game-stats {
-        padding: 5px;
-        font-size: 0.8em;
+        padding: 5px 8px;
+        font-size: 0.75em;
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+        gap: 4px;
     }
-    
+
+    #game-stats > div,
+    #game-stats > button {
+        padding: 3px 6px;
+        font-size: 0.7em;
+    }
+
+    #difficulty-bar {
+        padding: 4px 8px;
+        font-size: 0.7em;
+        margin-bottom: 4px;
+    }
+
     .password-display {
-        padding: 5px;
+        padding: 5px 8px;
+        margin-bottom: 4px;
     }
-    
+
+    .password-display p {
+        font-size: 0.7em;
+        margin: 2px 0;
+    }
+
+    #password-digits {
+        font-size: 1.2em;
+        margin: 3px 0;
+    }
+
     #instructions {
         display: none;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+        padding: 12px;
+        margin: 10px;
+    }
+
+    .modal-content h2,
+    .modal-content h3 {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+    }
+
+    .modal-content p {
+        font-size: 0.85em;
+        padding: 8px;
+    }
+
+    .modal-buttons {
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.8em;
+    }
+
+    #joystick-base {
+        width: 70px;
+        height: 70px;
+    }
+
+    #joystick-stick {
+        width: 28px;
+        height: 28px;
+    }
+
+    .mobile-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    #mobile-controls {
+        bottom: 5px;
+        padding: 0 10px;
     }
 }
 
 /* Modo Retrato em Tablets */
-@media (orientation: portrait) and (min-width: 768px) {
+@media (orientation: portrait) and (min-width: 768px) and (max-width: 1024px) {
+    :root {
+        --canvas-height: min(600px, 55vh);
+        --player-size: 38px;
+        --news-size: 30px;
+        --powerup-size: 34px;
+    }
+
     #game-canvas {
-        height: min(600px, 50vh);
+        height: min(600px, 55vh);
+        min-height: 400px;
+    }
+
+    #game-stats {
+        grid-template-columns: repeat(3, 1fr);
+        font-size: 0.9em;
+    }
+
+    #inventory-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
@@ -1402,13 +1749,155 @@ kbd {
     .modal-content {
         max-height: 70vh;
         padding: 10px;
+        overflow-y: auto;
     }
-    
+
     .modal-buttons {
         position: sticky;
         bottom: 0;
         background: inherit;
         padding: 10px 0;
+        z-index: 1;
+    }
+
+    #game-root {
+        height: auto;
+        min-height: 100vh;
+    }
+}
+
+/* Ajustes adicionais para telas muito pequenas */
+@media (max-width: 320px) {
+    :root {
+        --canvas-height: clamp(180px, 35vh, 250px);
+        --player-size: 26px;
+        --news-size: 20px;
+        --powerup-size: 23px;
+        --door-width: 35px;
+        --door-height: 50px;
+    }
+
+    body {
+        padding: 0;
+    }
+
+    #game-root {
+        padding: 5px;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    h1 {
+        font-size: 1em;
+        margin-bottom: 6px;
+    }
+
+    #game-stats {
+        grid-template-columns: repeat(2, 1fr);
+        font-size: 0.65em;
+        padding: 4px 6px;
+        gap: 3px;
+    }
+
+    #game-stats > div,
+    #game-stats > button {
+        padding: 3px 4px;
+        font-size: 0.65em;
+    }
+
+    .password-display p {
+        font-size: 0.7em;
+    }
+
+    #password-digits {
+        font-size: 1.1em;
+    }
+
+    #game-canvas {
+        min-height: 180px;
+    }
+
+    .modal-content {
+        padding: 12px;
+        margin: 8px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        font-size: 0.75em;
+        min-height: 40px;
+    }
+
+    .btn.start {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+
+    .tutorial-content li {
+        font-size: 0.8em;
+        padding-left: 18px;
+    }
+
+    #joystick-base {
+        width: 65px;
+        height: 65px;
+    }
+
+    #joystick-stick {
+        width: 25px;
+        height: 25px;
+    }
+
+    .mobile-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+}
+
+/* Melhorias para tablets em paisagem */
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1024px) {
+    :root {
+        --canvas-height: min(500px, 70vh);
+    }
+
+    #game-stats {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    #game-canvas {
+        height: min(500px, 70vh);
+    }
+}
+
+/* Prevenção de overflow em dispositivos pequenos */
+@media (max-width: 768px) {
+    #game-root {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .modal {
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .tutorial-content {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    #game-canvas {
+        touch-action: none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
     }
 }
 
