@@ -1378,7 +1378,7 @@ kbd {
     }
 
     #game-canvas {
-        height: 350px;
+        height: 100%;
         min-height: 100%;
     }
 
@@ -1468,7 +1468,7 @@ kbd {
     }
 
     #game-canvas {
-        height: min(450px, 60vh);
+        height: 100%;
         min-height: 100%;
     }
 
@@ -1613,7 +1613,7 @@ kbd {
     }
 
     #game-canvas {
-        height: calc(100vh - 200px);
+        height: 100%;
         min-height: 100%;
         flex: 1;
     }
@@ -1715,7 +1715,7 @@ kbd {
     }
 
     #game-canvas {
-        height: min(600px, 55vh);
+        height: 100%;
         min-height: 100%;
     }
 
@@ -1978,7 +1978,7 @@ kbd {
     }
 
     #game-canvas {
-        height: min(500px, 70vh);
+        height: 100%;
     }
 }
 
@@ -2019,6 +2019,7 @@ kbd {
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         user-select: none;
+        min-height: 100%;
     }
 
     #game-stats {
