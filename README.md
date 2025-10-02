@@ -56,6 +56,7 @@ cd EscapeRoom
 | **Interagir/Porta** | (Aproxime-se e clique)   | Botão 👆                    |
 | **Pausar/Retomar** | `Esc`                    | Botão ⏸️ / ▶️                |
 | **Som (On/Off)** | `M`                      | Botão 🔊 / 🔇                |
+| **Acessebilidade** | `H`                      | 3 toques na tela              |
 
 ## 📝 Licença
 
