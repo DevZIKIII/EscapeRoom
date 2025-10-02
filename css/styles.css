@@ -1189,8 +1189,7 @@ kbd {
     #game-root {
         padding: 6px;
         border-radius: 0;
-        min-height: 100vh;
-        max-height: 100vh;
+        min-height: 100%;
     }
 
     h1 {
@@ -1305,8 +1304,7 @@ kbd {
     #game-root {
         padding: 8px;
         border-radius: 8px;
-        min-height: 100vh;
-        max-height: 100vh;
+        min-height: 100%;
     }
 
     h1 {
@@ -1370,7 +1368,7 @@ kbd {
 
     #game-root {
         padding: 15px;
-        height: 100vh;
+        height: 100%;
         border-radius: 0;
     }
 
@@ -1825,8 +1823,7 @@ kbd {
 
     #game-root {
         padding: 8px;
-        min-height: 100vh;
-        max-height: 100vh;
+        min-height: 100%;
         border-radius: 0;
     }
 
