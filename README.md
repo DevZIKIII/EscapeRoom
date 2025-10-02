@@ -61,3 +61,5 @@ cd EscapeRoom
 ## 📝 Licença
 
 Este projeto é distribuído sob a licença MIT. Sinta-se à vontade para usar, modificar e distribuir como uma ferramenta educacional. Veja o arquivo `LICENSE` para mais detalhes.
+
+https://www.canva.com/design/DAG0mh5NSpU/MQfIW2mJead8SHR-kAPmFg/edit?utm_content=DAG0mh5NSpU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
