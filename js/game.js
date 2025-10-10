@@ -1092,7 +1092,7 @@ class EscapeRoomGame {
         }
     }
     
-    answerQuestion(userSaysFake) {
+        answerQuestion(userSaysFake) {
         this.acceptingModalInput = false;
         const item = this.newsItems[this.currentQuestionIndex];
         const questionData = item.questionData;
@@ -1130,9 +1130,12 @@ class EscapeRoomGame {
                 }
             }
 
+            // --- MUDANÇA PRINCIPAL AQUI (RESPOSTA CORRETA) ---
             if (this.accessibilityMode) {
                 const textToSpeak = `Correto! O número ${questionData.digit} foi adicionado à senha.`;
-                this.accessibilityManager.speak(textToSpeak, unpauseGame);
+                // A narração é iniciada, mas o jogo é liberado IMEDIATAMENTE.
+                this.accessibilityManager.speak(textToSpeak);
+                unpauseGame(); // O jogador pode se mover enquanto ouve a confirmação.
             } else {
                 unpauseGame();
             }
@@ -1166,17 +1169,21 @@ class EscapeRoomGame {
                 textToSpeak = `Incorreto. ${questionData.explanation}.`;
             }
 
+            // --- MUDANÇA PRINCIPAL AQUI (RESPOSTA INCORRETA) ---
             if (this.accessibilityMode) {
-                this.accessibilityManager.speak(textToSpeak, () => {
-                    this.accessibilityManager.speak(this.getNewsNarrationText());
-                    this.acceptingModalInput = true;
-                });
+                // Narra o resultado do erro.
+                this.accessibilityManager.speak(textToSpeak);
+                // Permite que o jogador tente responder novamente de imediato.
+                // A próxima tentativa (keydown) irá cancelar esta fala e processar a nova resposta.
+                this.acceptingModalInput = true;
             } else {
                 unpauseGame();
             }
         }
         
         this.updateUI();
+        // Apenas fecha o modal se a resposta estiver correta ou se não estiver no modo acessibilidade.
+        // No modo acessibilidade, o modal permanece aberto em caso de erro para uma nova tentativa.
         if (isCorrect || !this.accessibilityMode) {
             document.getElementById('modal').classList.add('hidden');
         }
