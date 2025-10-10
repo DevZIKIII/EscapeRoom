@@ -1060,7 +1060,7 @@ class EscapeRoomGame {
             this.acceptingModalInput = false;
             setTimeout(() => {
                 this.acceptingModalInput = true;
-            }, 300);
+            }, 500);
 
             this.accessibilityManager.speak(this.getNewsNarrationText());
         }
@@ -1112,25 +1112,29 @@ class EscapeRoomGame {
             this.correctStreak++;
             this.wrongStreak = 0;
             
-            let bonus = 0;
-            const streakBonuses = [3, 5, 7, 10, 12, 15, 20, 25, 30, 40, 50];
-            if (streakBonuses.includes(this.correctStreak)) {
-                bonus = this.correctStreak * 5;
-                this.score += bonus;
-                this.showFeedback(
-                    `✅ Correto! +10 pontos\n📍 Número ${questionData.digit} adicionado!\n🔥 Bônus streak x${this.correctStreak}: +${bonus} pontos!`,
-                    'correct'
-                );
-            } else {
-                this.showFeedback(
-                    `✅ Correto! +10 pontos\n📍 Número ${questionData.digit} adicionado à senha!`,
-                    'correct'
-                );
+            if (!this.accessibilityMode) {
+                let bonus = 0;
+                const streakBonuses = [3, 5, 7, 10, 12, 15, 20, 25, 30, 40, 50];
+                if (streakBonuses.includes(this.correctStreak)) {
+                    bonus = this.correctStreak * 5;
+                    this.score += bonus;
+                    this.showFeedback(
+                        `✅ Correto! +10 pontos\n📍 Número ${questionData.digit} adicionado!\n🔥 Bônus streak x${this.correctStreak}: +${bonus} pontos!`,
+                        'correct'
+                    );
+                } else {
+                    this.showFeedback(
+                        `✅ Correto! +10 pontos\n📍 Número ${questionData.digit} adicionado à senha!`,
+                        'correct'
+                    );
+                }
             }
 
             if (this.accessibilityMode) {
                 const textToSpeak = `Correto! O número ${questionData.digit} foi adicionado à senha.`;
-                this.accessibilityManager.speak(textToSpeak);
+                this.accessibilityManager.speak(textToSpeak, unpauseGame);
+            } else {
+                unpauseGame();
             }
 
         } else {
@@ -1141,31 +1145,41 @@ class EscapeRoomGame {
             if (this.shieldActive) {
                 this.shieldActive = false;
                 document.getElementById('game-canvas').classList.remove('shield-active');
-                this.showFeedback(
-                    `❌ ${questionData.explanation}\n🛡️ Escudo absorveu a penalidade e protegeu sua sequência!`,
-                    'incorrect'
-                );
+                if (!this.accessibilityMode) {
+                    this.showFeedback(
+                        `❌ ${questionData.explanation}\n🛡️ Escudo absorveu a penalidade e protegeu sua sequência!`,
+                        'incorrect'
+                    );
+                }
                 textToSpeak = `Incorreto. ${questionData.explanation}. Seu escudo absorveu a penalidade.`;
 
             } else {
                 this.correctStreak = 0;
-                const penalty = Math.min(this.wrongStreak * 5, 20);
-                this.timeLeft = Math.max(0, this.timeLeft - penalty);
-                this.showFeedback(
-                    `❌ ${questionData.explanation}\n⏰ Tempo perdido: -${penalty} segundos!`,
-                    'incorrect'
-                );
+                if (!this.accessibilityMode) {
+                    const penalty = Math.min(this.wrongStreak * 5, 20);
+                    this.timeLeft = Math.max(0, this.timeLeft - penalty);
+                    this.showFeedback(
+                        `❌ ${questionData.explanation}\n⏰ Tempo perdido: -${penalty} segundos!`,
+                        'incorrect'
+                    );
+                }
                 textToSpeak = `Incorreto. ${questionData.explanation}.`;
             }
 
             if (this.accessibilityMode) {
-                this.accessibilityManager.speak(textToSpeak);
+                this.accessibilityManager.speak(textToSpeak, () => {
+                    this.accessibilityManager.speak(this.getNewsNarrationText());
+                    this.acceptingModalInput = true;
+                });
+            } else {
+                unpauseGame();
             }
         }
         
         this.updateUI();
-        document.getElementById('modal').classList.add('hidden');
-        unpauseGame();
+        if (isCorrect || !this.accessibilityMode) {
+            document.getElementById('modal').classList.add('hidden');
+        }
     }
     
     addDigitToPassword(digit) {
@@ -1204,7 +1218,7 @@ class EscapeRoomGame {
             } else {
                 this.winGame();
             }
-        } else if (this.isPlayerCollidingWithDoor()) {
+        } else if (this.isPlayerCollidingWithDoor() && !this.accessibilityMode) {
             this.showFeedback('🔒 Você precisa descobrir todos os números da senha primeiro!', 'incorrect');
         }
     }
@@ -1234,10 +1248,12 @@ class EscapeRoomGame {
         
         this.door.classList.remove('unlocked');
         const nextRoomName = this.shuffledRooms[this.currentRoomIndex].name;
-        this.showFeedback(
-            `🎊 Parabéns! Você avançou para ${nextRoomName}!\n⏰ +1 minuto no cronômetro!`,
-            'correct'
-        );
+        if (!this.accessibilityMode) {
+            this.showFeedback(
+                `🎊 Parabéns! Você avançou para ${nextRoomName}!\n⏰ +1 minuto no cronômetro!`,
+                'correct'
+            );
+        }
         
         setTimeout(() => {
             this.initializeRoom();
@@ -1258,10 +1274,12 @@ class EscapeRoomGame {
             this.soundManager.sounds.background?.play();
         }
         
-        this.showFeedback(
-            this.gameRunning ? '▶️ Jogo retomado!' : '⏸️ Jogo pausado!',
-            this.gameRunning ? 'correct' : 'incorrect'
-        );
+        if (!this.accessibilityMode) {
+            this.showFeedback(
+                this.gameRunning ? '▶️ Jogo retomado!' : '⏸️ Jogo pausado!',
+                this.gameRunning ? 'correct' : 'incorrect'
+            );
+        }
     }
     
     openInventory() {
@@ -1273,9 +1291,6 @@ class EscapeRoomGame {
         mochilaModal.classList.remove('hidden');
 
         this.toggleBackgroundAccessibility(true);
-        if (this.accessibilityMode) {
-            mochilaModal.querySelector('h3').focus();
-        }
     }
 
     toggleBackgroundAccessibility(hide) {
@@ -1322,6 +1337,7 @@ class EscapeRoomGame {
     }
     
     updateUI() {
+        if (this.accessibilityMode) return;
         document.getElementById('score').textContent = `Pontos: ${this.score}`;
         document.getElementById('streak-info').textContent = `Sequência: ${this.correctStreak}`;
     }
@@ -1338,13 +1354,15 @@ class EscapeRoomGame {
             const seconds = this.timeLeft % 60;
             const timerEl = document.getElementById('timer');
             
-            timerEl.textContent = `Tempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (timerEl) {
+                timerEl.textContent = `Tempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
             
             if (!this.accessibilityMode) {
-                if (this.timeLeft <= 60) {
+                if (this.timeLeft <= 60 && timerEl) {
                     timerEl.style.color = '#ff6b6b';
                     timerEl.style.animation = 'pulse-timer 0.5s infinite';
-                } else if (this.timeLeft <= 180) {
+                } else if (this.timeLeft <= 180 && timerEl) {
                     timerEl.style.color = '#ffa500';
                 }
                 
