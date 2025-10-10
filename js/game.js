@@ -48,9 +48,13 @@ class AccessibilityManager {
         document.getElementById('route-btn').classList.remove('hidden');
         
         this.initAudioContext();
-        this.startFeedbackLoop();
         
-        this.speak('Modo acessibilidade ativado. Toque três vezes na tela para calcular a rota.');
+        const welcomeMessage = 'Modo acessibilidade ativado. Pressione H para a rota do item, ou I para ouvir o status do jogo.';
+        
+        this.speak(welcomeMessage, () => {
+            this.startFeedbackLoop();
+            console.log('Loop de feedback de proximidade iniciado após a mensagem de boas-vindas.');
+        });
     }
     
     disable() {
@@ -241,18 +245,24 @@ class AccessibilityManager {
         this.speak(instructions);
     }
     
-    speak(text) {
+    speak(text, onEndCallback) {
         if ('speechSynthesis' in window) {
             speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'pt-BR';
             utterance.rate = 1.3;
+
+            if (typeof onEndCallback === 'function') {
+                utterance.onend = onEndCallback;
+            }
+
             speechSynthesis.speak(utterance);
+        } else if (typeof onEndCallback === 'function') {
+            onEndCallback();
         }
     }
 }
 
-// Sistema de Controles Mobile
 class MobileControls {
     constructor(game) {
         this.game = game;
@@ -375,7 +385,6 @@ class MobileControls {
     }
 }
 
-// Sistema de Som
 class SoundManager {
     constructor() {
         this.enabled = true;
@@ -427,23 +436,18 @@ class SoundManager {
     }
 }
 
-// Sistema de Inventário
 class Inventory {
     constructor() {
         this.items = {
             time: 0,
             hint: 0,
             shield: 0,
-            speed: 0,
-            radar: 0
         };
         
         this.itemInfo = {
             time: { name: 'Relógio', icon: '⏰', effect: 'Adiciona 30 segundos' },
             hint: { name: 'Lupa', icon: '💡', effect: 'Revela uma dica' },
             shield: { name: 'Escudo', icon: '🛡️', effect: 'Protege de 1 penalidade' },
-            speed: { name: 'Velocidade', icon: '⚡', effect: 'Movimento 2x mais rápido por 15s' },
-            radar: { name: 'Radar', icon: '🎯', effect: 'Mostra todos os itens por 5s' }
         };
     }
     
@@ -477,24 +481,6 @@ class Inventory {
                 game.shieldActive = true;
                 document.getElementById('game-canvas').classList.add('shield-active');
                 game.showFeedback('🛡️ Escudo ativado! Protegido contra 1 penalidade.', 'correct');
-                break;
-            case 'speed':
-                game.speedBoost = true;
-                game.playerSpeed = 8;
-                document.getElementById('game-canvas').classList.add('speed-boost');
-                setTimeout(() => {
-                    game.speedBoost = false;
-                    game.playerSpeed = 4;
-                    document.getElementById('game-canvas').classList.remove('speed-boost');
-                }, 15000);
-                game.showFeedback('⚡ Velocidade aumentada por 15 segundos!', 'correct');
-                break;
-            case 'radar':
-                document.getElementById('game-canvas').classList.add('radar-active');
-                setTimeout(() => {
-                    document.getElementById('game-canvas').classList.remove('radar-active');
-                }, 5000);
-                game.showFeedback('🎯 Radar ativado! Todos os itens visíveis por 5 segundos!', 'correct');
                 break;
         }
     }
@@ -542,15 +528,15 @@ function shuffleArray(array) {
 import rooms from './rooms.js';
 
 class EscapeRoomGame {
-    constructor() {
+    constructor(options = {}) {
         window.currentGame = this;
-        
+    
         this.player = {
             x: 40,
             y: 40,
             element: document.getElementById('player'),
         };
-        
+    
         this.shuffledRooms = shuffleArray([...rooms]);
         this.currentRoomIndex = 0;
         this.maxRooms = this.shuffledRooms.length;
@@ -563,63 +549,52 @@ class EscapeRoomGame {
         this.currentPassword = [];
         this.newsItems = [];
         this.powerUps = [];
-        
+    
         this.soundManager = new SoundManager();
         this.inventory = new Inventory();
-        
+    
         this.correctStreak = 0;
         this.wrongStreak = 0;
         this.movementPaused = false;
         this.playerSpeed = 4;
-        this.speedBoost = false;
         this.shieldActive = false;
-        this.hintAvailable = false;
-        this.accessibilityMode = false;
+        this.isHintActiveForCurrentQuestion = false;
+        this.acceptingModalInput = false;
+    
+        this.accessibilityMode = options.accessibility || false;
         this.accessibilityManager = new AccessibilityManager(this);
         this.mobileControls = new MobileControls(this);
-        
+    
         this.h1Title = document.getElementById('room-title');
         this.canvas = document.getElementById('game-canvas');
         this.door = document.getElementById('door');
-        
+    
         this.keys = {
             left: false,
             right: false,
             up: false,
             down: false
         };
-        
+    
         this.lastDirection = null;
-
-        // --- NOVO: Variáveis para detectar toque triplo ---
+    
         this.tapCount = 0;
         this.lastTapTime = 0;
-        
+    
         this.init();
     }
     
     async init() {
-        this.showTutorial();
         await this.loadRoomData();
         this.setupEventListeners();
-    }
     
-    showTutorial() {
-        const tutorialModal = document.getElementById('tutorial-modal');
-        tutorialModal.classList.remove('hidden');
-        
-        document.getElementById('normal-mode-btn').addEventListener('click', () => {
-            tutorialModal.classList.add('hidden');
-            this.accessibilityMode = false;
-            this.startGame();
-        });
-        
-        document.getElementById('accessibility-mode-btn').addEventListener('click', () => {
-            tutorialModal.classList.add('hidden');
-            this.accessibilityMode = true;
+        if (this.accessibilityMode) {
             this.accessibilityManager.enable();
-            this.startGame();
-        });
+            document.getElementById('mochila-btn')?.classList.add('hidden');
+            document.getElementById('mobile-mochila')?.classList.add('hidden');
+        }
+    
+        this.startGame();
     }
 
     startGame() {
@@ -701,7 +676,6 @@ class EscapeRoomGame {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('keyup', (e) => this.handleKeyUp(e));
         
-        // --- NOVO: Listener de toque para o gesto de toque triplo ---
         this.canvas.addEventListener('touchend', (e) => this.handleTripleTap(e));
         
         document.getElementById('fake-btn').addEventListener('click', () => this.answerQuestion(true));
@@ -727,14 +701,13 @@ class EscapeRoomGame {
         document.getElementById('close-mochila')?.addEventListener('click', () => this.closeInventory());
     }
     
-    // --- NOVA FUNÇÃO: Lógica para detectar o toque triplo ---
     handleTripleTap(e) {
         if (!this.accessibilityMode) return;
 
         const currentTime = new Date().getTime();
         const timeSinceLastTap = currentTime - this.lastTapTime;
 
-        if (timeSinceLastTap < 500) { // Toques devem ser rápidos
+        if (timeSinceLastTap < 500) {
             this.tapCount++;
         } else {
             this.tapCount = 1;
@@ -745,11 +718,35 @@ class EscapeRoomGame {
         if (this.tapCount === 3) {
             e.preventDefault();
             this.accessibilityManager.provideRouteToNearestItem();
-            this.tapCount = 0; // Reseta a contagem
+            this.tapCount = 0;
         }
     }
     
     handleKeyDown(e) {
+        if (this.movementPaused && this.accessibilityMode && !document.getElementById('modal').classList.contains('hidden') && this.acceptingModalInput) {
+            switch (e.key.toLowerCase()) {
+                case 'arrowleft':
+                    this.answerQuestion(true);
+                    e.preventDefault();
+                    break;
+                case 'arrowright':
+                    this.answerQuestion(false);
+                    e.preventDefault();
+                    break;
+                case 'arrowdown':
+                    if (this.inventory.items.hint > 0 && !this.isHintActiveForCurrentQuestion) {
+                        this.useHint();
+                    }
+                    e.preventDefault();
+                    break;
+                case 'arrowup':
+                    this.accessibilityManager.speak(this.getNewsNarrationText());
+                    e.preventDefault();
+                    break;
+            }
+            return;
+        }
+
         if (this.movementPaused) return;
         
         switch (e.key.toLowerCase()) {
@@ -778,11 +775,18 @@ class EscapeRoomGame {
                 e.preventDefault();
                 break;
             case 'b':
-                this.openInventory();
+                if (!this.accessibilityMode) {
+                    this.openInventory();
+                }
                 break;
             case 'h':
                 if (this.accessibilityMode) {
                     this.accessibilityManager.provideRouteToNearestItem();
+                }
+                break;
+            case 'i':
+                if (this.accessibilityMode) {
+                    this.announceStatus();
                 }
                 break;
         }
@@ -812,7 +816,7 @@ class EscapeRoomGame {
     updatePlayer() {
         if (this.movementPaused || !this.gameRunning) return;
         
-        const speed = this.speedBoost ? this.playerSpeed * 2 : this.playerSpeed;
+        const speed = this.playerSpeed;
         let moved = false;
         const playerEl = this.player.element;
         
@@ -919,9 +923,13 @@ class EscapeRoomGame {
         const container = document.getElementById('power-ups');
         container.innerHTML = '';
         this.powerUps = [];
+
+        let powerUpTypes = ['time', 'hint', 'shield'];
+        if (this.accessibilityMode) {
+            powerUpTypes = ['hint'];
+        }
         
         const numPowerUps = Math.floor(Math.random() * 2) + 1;
-        const powerUpTypes = ['time', 'hint', 'shield', 'speed', 'radar'];
         
         for (let i = 0; i < numPowerUps; i++) {
             const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
@@ -999,15 +1007,64 @@ class EscapeRoomGame {
         const itemInfo = this.inventory.itemInfo[powerUp.type];
         this.showFeedback(`${itemInfo.icon} Coletou ${itemInfo.name}!`, 'correct');
     }
+
+    announceStatus() {
+        if (!this.accessibilityMode) return;
+
+        const roomName = this.shuffledRooms[this.currentRoomIndex]?.name || `Sala ${this.currentRoomIndex + 1}`;
+        const scoreText = this.accessibilityMode ? '' : ` Pontuação: ${this.score} pontos.`;
+        const password = `Senha atual: ${this.currentPassword.map(d => (d === '_' ? 'espaço' : d)).join(', ')}.`;
+
+        const textToSpeak = `Status da sala ${roomName}.${scoreText} ${password}`;
+        this.accessibilityManager.speak(textToSpeak);
+    }
+
+    getNewsNarrationText() {
+        const modalTitle = document.getElementById('modal-title');
+        const titleText = modalTitle.textContent;
+        const newsText = this.currentQuestion.text;
+    
+        let instructions = ` Pressione a seta para a esquerda para notícia falsa, ou seta para a direita para notícia real. Pressione a seta para cima para repetir esta mensagem.`;
+    
+        if (this.inventory.items.hint > 0 && !this.isHintActiveForCurrentQuestion) {
+            instructions += ` Você tem ${this.inventory.items.hint} dica. Pressione a seta para baixo para usar.`;
+        }
+    
+        let hintTextToSpeak = '';
+        if (this.isHintActiveForCurrentQuestion) {
+            const hintText = this.currentQuestion.hint || (this.currentQuestion.isFake ? "Questione: Isso parece realista ou exagerado?" : "Isso está alinhado com o conhecimento científico estabelecido.");
+            hintTextToSpeak = ` A dica ativada é: ${hintText}.`;
+        }
+    
+        return `${titleText}. ${newsText}.${hintTextToSpeak}${instructions}`;
+    }
     
     showNewsModal(questionData, itemIndex) {
+        this.keys.left = this.keys.right = this.keys.up = this.keys.down = false;
+        
+        this.isHintActiveForCurrentQuestion = false;
         this.currentQuestionIndex = itemIndex;
         this.currentQuestion = questionData;
         
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+
         document.getElementById('modal-news').textContent = questionData.text;
-        document.getElementById('modal').classList.remove('hidden');
+        modal.classList.remove('hidden');
         this.movementPaused = true;
         
+        this.toggleBackgroundAccessibility(true);
+        if (this.accessibilityMode) {
+            modalTitle.focus();
+            
+            this.acceptingModalInput = false;
+            setTimeout(() => {
+                this.acceptingModalInput = true;
+            }, 300);
+
+            this.accessibilityManager.speak(this.getNewsNarrationText());
+        }
+
         const hintBtn = document.getElementById('use-hint-btn');
         if (this.inventory.items.hint > 0) {
             hintBtn.style.display = 'inline-block';
@@ -1021,23 +1078,31 @@ class EscapeRoomGame {
 
     useHint() {
         if (this.inventory.items.hint > 0 && this.currentQuestion) {
+            this.isHintActiveForCurrentQuestion = true;
             this.inventory.items.hint--;
-            const hintText = this.currentQuestion.hint || 
-                            (this.currentQuestion.isFake ? 
-                             "Questione: Isso parece realista ou exagerado?" : 
-                             "Isso está alinhado com o conhecimento científico estabelecido.");
             
-            document.getElementById('hint-content').textContent = hintText;
-            document.getElementById('hint-section').classList.remove('hidden');
-            document.getElementById('use-hint-btn').style.display = 'none';
+            if (this.accessibilityMode) {
+                this.accessibilityManager.speak(this.getNewsNarrationText());
+            } else {
+                const hintText = this.currentQuestion.hint || (this.currentQuestion.isFake ? "Questione: Isso parece realista ou exagerado?" : "Isso está alinhado com o conhecimento científico estabelecido.");
+                document.getElementById('hint-content').textContent = hintText;
+                document.getElementById('hint-section').classList.remove('hidden');
+                document.getElementById('use-hint-btn').style.display = 'none';
+            }
         }
     }
     
     answerQuestion(userSaysFake) {
+        this.acceptingModalInput = false;
         const item = this.newsItems[this.currentQuestionIndex];
         const questionData = item.questionData;
         const isCorrect = userSaysFake === questionData.isFake;
         
+        const unpauseGame = () => {
+            this.toggleBackgroundAccessibility(false);
+            this.movementPaused = false;
+        };
+
         if (isCorrect) {
             this.soundManager.play('correct');
             this.score += 10;
@@ -1062,10 +1127,17 @@ class EscapeRoomGame {
                     'correct'
                 );
             }
+
+            if (this.accessibilityMode) {
+                const textToSpeak = `Correto! O número ${questionData.digit} foi adicionado à senha.`;
+                this.accessibilityManager.speak(textToSpeak);
+            }
+
         } else {
             this.soundManager.play('wrong');
             this.wrongStreak++;
-    
+            let textToSpeak = '';
+
             if (this.shieldActive) {
                 this.shieldActive = false;
                 document.getElementById('game-canvas').classList.remove('shield-active');
@@ -1073,21 +1145,27 @@ class EscapeRoomGame {
                     `❌ ${questionData.explanation}\n🛡️ Escudo absorveu a penalidade e protegeu sua sequência!`,
                     'incorrect'
                 );
+                textToSpeak = `Incorreto. ${questionData.explanation}. Seu escudo absorveu a penalidade.`;
+
             } else {
                 this.correctStreak = 0;
-        
                 const penalty = Math.min(this.wrongStreak * 5, 20);
                 this.timeLeft = Math.max(0, this.timeLeft - penalty);
                 this.showFeedback(
                     `❌ ${questionData.explanation}\n⏰ Tempo perdido: -${penalty} segundos!`,
                     'incorrect'
                 );
+                textToSpeak = `Incorreto. ${questionData.explanation}.`;
+            }
+
+            if (this.accessibilityMode) {
+                this.accessibilityManager.speak(textToSpeak);
             }
         }
         
         this.updateUI();
         document.getElementById('modal').classList.add('hidden');
-        this.movementPaused = false;
+        unpauseGame();
     }
     
     addDigitToPassword(digit) {
@@ -1096,11 +1174,21 @@ class EscapeRoomGame {
             this.foundDigits++;
             this.updatePasswordDisplay();
             
+            if (this.accessibilityMode) {
+                const passwordForSpeech = this.currentPassword.map(d => (d === '_' ? 'espaço' : d)).join(', ');
+                const textToSpeak = `A senha agora é: ${passwordForSpeech}`;
+                this.accessibilityManager.speak(textToSpeak);
+            }
+
             if (this.foundDigits === this.passwordLength) {
                 this.soundManager.play('unlock');
                 this.door.classList.add('unlocked');
                 document.getElementById('password-hint').textContent = 
                     '🎉 Senha completa! Vá até a porta para avançar!';
+                
+                if (this.accessibilityMode) {
+                    this.accessibilityManager.speak("Senha completa! Encontre a porta para escapar da sala.");
+                }
             }
         }
     }
@@ -1177,14 +1265,42 @@ class EscapeRoomGame {
     }
     
     openInventory() {
+        if (this.accessibilityMode) return;
+
         this.movementPaused = true;
         this.inventory.render();
-        document.getElementById('mochila-modal').classList.remove('hidden');
+        const mochilaModal = document.getElementById('mochila-modal');
+        mochilaModal.classList.remove('hidden');
+
+        this.toggleBackgroundAccessibility(true);
+        if (this.accessibilityMode) {
+            mochilaModal.querySelector('h3').focus();
+        }
+    }
+
+    toggleBackgroundAccessibility(hide) {
+        if (!this.accessibilityMode) return;
+
+        const elementsToToggle = [
+            document.getElementById('game-stats'),
+            document.getElementById('difficulty-bar'),
+            document.querySelector('.password-display'),
+            document.getElementById('game-canvas'),
+            document.getElementById('instructions')
+        ];
+
+        elementsToToggle.forEach(el => {
+            if (el) {
+                el.setAttribute('aria-hidden', hide);
+            }
+        });
     }
     
     closeInventory() {
         this.movementPaused = false;
         document.getElementById('mochila-modal').classList.add('hidden');
+
+        this.toggleBackgroundAccessibility(false);
     }
     
     showFeedback(message, type) {
@@ -1301,6 +1417,4 @@ class EscapeRoomGame {
     }
 }
 
-export function startGame() {
-    new EscapeRoomGame();
-}
+export { EscapeRoomGame };

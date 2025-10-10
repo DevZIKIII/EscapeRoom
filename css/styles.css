@@ -2080,3 +2080,118 @@ kbd {
         box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
     }
 }
+
+/* ========================================
+   TELA DE MENU INICIAL
+   ======================================== */
+
+/* Classe para esconder elementos de forma acessível */
+.hidden {
+    display: none !important;
+}
+
+#start-menu {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: clamp(20px, 4vw, 40px);
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 15px;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#start-menu h1 {
+    font-size: clamp(1.8em, 5vw, 2.5em);
+    margin-bottom: 20px;
+}
+
+#start-menu h2 {
+    color: #ffd700;
+    font-size: clamp(1.2em, 3vw, 1.5em);
+    margin-top: 25px;
+    margin-bottom: 10px;
+    border-top: 1px solid rgba(255, 215, 0, 0.3);
+    padding-top: 15px;
+}
+
+#start-menu p, #start-menu li {
+    font-size: clamp(0.9em, 2vw, 1.1em);
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#start-menu ul {
+    list-style: none;
+    padding: 0;
+}
+
+#start-menu li {
+    margin-bottom: 8px;
+}
+
+.mode-selection {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    align-items: center;
+}
+
+.mode-selection .btn {
+    width: 100%;
+    max-width: 300px;
+}
+
+/* ========================================
+   SIMPLIFICAÇÃO PARA MODO ACESSIBILIDADE
+   ======================================== */
+
+/* Esconde permanentemente os painéis superior e inferior no modo acessibilidade */
+.accessibility-mode #game-stats,
+.accessibility-mode #difficulty-bar,
+.accessibility-mode .password-display,
+.accessibility-mode #instructions {
+    display: none;
+}
+
+/* Garante que o canvas ocupe o espaço liberado */
+.accessibility-mode #game-root {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.accessibility-mode #game-canvas {
+    height: calc(100vh - 40px); /* Ajusta a altura do canvas para ocupar a tela */
+    min-height: 400px;
+}
+
+/* Em css/styles.css */
+#countdown-screen {
+    text-align: center;
+    padding: 20px;
+}
+
+#countdown-screen h2 {
+    color: #ffd700;
+}
+
+#countdown-timer {
+    font-size: clamp(3em, 10vw, 5em);
+    font-weight: bold;
+    color: #00ff88;
+    margin: 10px 0;
+}
+
+/* Esconde permanentemente os botões da mochila no modo acessibilidade */
+.accessibility-mode #mochila-btn,
+.accessibility-mode #mobile-mochila {
+    display: none !important;
+}
