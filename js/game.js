@@ -45,7 +45,6 @@ class AccessibilityManager {
         this.enabled = true;
         document.body.classList.add('accessibility-mode');
         document.getElementById('accessibility-indicator').classList.remove('hidden');
-        document.getElementById('route-btn').classList.remove('hidden');
         
         this.initAudioContext();
         
@@ -61,7 +60,6 @@ class AccessibilityManager {
         this.enabled = false;
         document.body.classList.remove('accessibility-mode');
         document.getElementById('accessibility-indicator').classList.add('hidden');
-        document.getElementById('route-btn').classList.add('hidden');
         
         this.stopFeedbackLoop();
         if (this.audioContext && this.audioContext.state !== 'closed') {
@@ -643,7 +641,6 @@ class EscapeRoomGame {
         }
         
         document.getElementById('room-info').textContent = roomName;
-        document.getElementById('high-score').textContent = `Recorde: ${getLocalHighScore()}`;
         
         const progress = ((this.currentRoomIndex + 1) / this.maxRooms) * 100;
         document.querySelector('.difficulty-fill').style.width = `${progress}%`;
@@ -685,17 +682,6 @@ class EscapeRoomGame {
         this.door.addEventListener('click', () => this.tryOpenDoor());
         
         document.getElementById('pause-btn')?.addEventListener('click', () => this.togglePause());
-        
-        document.getElementById('sound-btn')?.addEventListener('click', () => {
-            const enabled = this.soundManager.toggle();
-            document.getElementById('sound-btn').textContent = enabled ? '🔊 Som' : '🔇 Som';
-        });
-
-        document.getElementById('route-btn')?.addEventListener('click', () => {
-            if (this.accessibilityMode) {
-                this.accessibilityManager.provideRouteToNearestItem();
-            }
-        });
         
         document.getElementById('mochila-btn')?.addEventListener('click', () => this.openInventory());
         document.getElementById('close-mochila')?.addEventListener('click', () => this.closeInventory());
