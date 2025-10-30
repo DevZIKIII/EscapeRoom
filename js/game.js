@@ -305,9 +305,10 @@ class MobileControls {
             this.game.openInventory();
         });
         
-        document.getElementById('mobile-interact')?.addEventListener('touchstart', (e) => {
+        // Adiciona o listener para o novo botão de pause mobile
+        document.getElementById('mobile-pause')?.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            this.game.tryOpenDoor();
+            this.game.togglePause();
         });
     }
     
@@ -1256,9 +1257,15 @@ class EscapeRoomGame {
     togglePause() {
         this.gameRunning = !this.gameRunning;
         this.movementPaused = !this.gameRunning;
-        const pauseBtn = document.getElementById('pause-btn');
-        if (pauseBtn) {
-            pauseBtn.textContent = this.gameRunning ? '⏸️ Pausar' : '▶️ Retomar';
+        const desktopPauseBtn = document.getElementById('pause-btn');
+        const mobilePauseBtn = document.getElementById('mobile-pause'); // Botão mobile
+
+        if (desktopPauseBtn) {
+            desktopPauseBtn.textContent = this.gameRunning ? '⏸️ Pausar' : '▶️ Retomar';
+        }
+        if (mobilePauseBtn) {
+            // Apenas troca o ícone no botão mobile
+            mobilePauseBtn.textContent = this.gameRunning ? '⏸️' : '▶️';
         }
         
         if (!this.gameRunning) {
