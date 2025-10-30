@@ -1177,7 +1177,7 @@ kbd {
 /* Smartphones Pequenos (320px - 360px) */
 @media (max-width: 360px) {
     :root {
-        --canvas-height: clamp(160px, 25vh, 250px);
+        --canvas-height: clamp(160px, 20vh, 250px);
         --player-size: 28px;
         --news-size: 22px;
         --powerup-size: 25px;
@@ -1293,7 +1293,7 @@ kbd {
 /* Smartphones Médios (361px - 480px) */
 @media (min-width: 361px) and (max-width: 480px) {
     :root {
-        --canvas-height: clamp(250px, 45vh, 340px);
+        --canvas-height: clamp(250px, 30vh, 340px);
         --player-size: 32px;
         --news-size: 26px;
         --powerup-size: 30px;
@@ -1822,7 +1822,7 @@ kbd {
 /* Media query específica para viewport comum de smartphones modernos */
 @media (min-width: 361px) and (max-width: 414px) {
     :root {
-        --canvas-height: clamp(220px, 30vh, 300px);
+        --canvas-height: clamp(200px, 28vh, 300px);
         --font-size-title: 1.35em;
     }
 
@@ -1873,7 +1873,7 @@ kbd {
     }
 
     #game-canvas {
-        min-height: 220px;
+        min-height: 200px;
     }
 
     #instructions {
