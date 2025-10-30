@@ -1177,7 +1177,7 @@ kbd {
 /* Smartphones Pequenos (320px - 360px) */
 @media (max-width: 360px) {
     :root {
-        --canvas-height: clamp(130px, 15vh, 250px);
+        --canvas-height: clamp(130px, 15vh, 200px);
         --player-size: 28px;
         --news-size: 22px;
         --powerup-size: 25px;
@@ -1293,7 +1293,7 @@ kbd {
 /* Smartphones Médios (361px - 480px) */
 @media (min-width: 361px) and (max-width: 480px) {
     :root {
-        --canvas-height: clamp(220px, 25vh, 340px);
+        --canvas-height: clamp(220px, 25vh, 290px);
         --player-size: 32px;
         --news-size: 26px;
         --powerup-size: 30px;
@@ -1822,7 +1822,7 @@ kbd {
 /* Media query específica para viewport comum de smartphones modernos */
 @media (min-width: 361px) and (max-width: 414px) {
     :root {
-        --canvas-height: clamp(180px, 25vh, 300px);
+        --canvas-height: clamp(180px, 25vh, 250px);
         --font-size-title: 1.35em;
     }
 
