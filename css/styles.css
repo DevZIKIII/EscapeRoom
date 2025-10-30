@@ -1017,16 +1017,14 @@ kbd {
    ======================================== */
 
 #mobile-controls {
-    position: fixed;
-    bottom: clamp(10px, 2vh, 20px);
-    left: 0;
-    right: 0;
+    position: relative; /* Mudado de 'fixed' */
+    /* bottom, left, right, z-index removidos */
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     padding: 0 clamp(10px, 2vw, 20px);
     pointer-events: none;
-    z-index: 100;
+    margin-top: clamp(10px, 2vh, 15px); /* Adicionado para dar espaço */
 }
 
 #mobile-controls.hidden {
@@ -1762,7 +1760,7 @@ kbd {
     }
     
     #game-canvas {
-        margin-bottom: 150px;
+        /* margin-bottom: 150px; */
     }
 }
 
