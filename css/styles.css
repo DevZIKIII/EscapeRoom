@@ -1177,7 +1177,7 @@ kbd {
 /* Smartphones Pequenos (320px - 360px) */
 @media (max-width: 360px) {
     :root {
-        --canvas-height: clamp(200px, 40vh, 280px);
+        --canvas-height: clamp(180px, 30vh, 250px);
         --player-size: 28px;
         --news-size: 22px;
         --powerup-size: 25px;
@@ -1228,7 +1228,7 @@ kbd {
     }
 
     #game-canvas {
-        min-height: 200px;
+        min-height: 180px;
     }
 
     #inventory-grid {
@@ -1822,7 +1822,7 @@ kbd {
 /* Media query específica para viewport comum de smartphones modernos */
 @media (min-width: 361px) and (max-width: 414px) {
     :root {
-        --canvas-height: clamp(280px, 48vh, 360px);
+        --canvas-height: clamp(240px, 35vh, 300px);
         --font-size-title: 1.35em;
     }
 
@@ -1873,7 +1873,7 @@ kbd {
     }
 
     #game-canvas {
-        min-height: 280px;
+        min-height: 240px;
     }
 
     #instructions {
