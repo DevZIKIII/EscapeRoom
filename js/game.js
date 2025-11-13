@@ -1068,13 +1068,20 @@ class EscapeRoomGame {
             this.isHintActiveForCurrentQuestion = true;
             this.inventory.items.hint--;
             
+            // 1. Lógica Visual (Executa SEMPRE)
+            const hintText = this.currentQuestion.hint || (this.currentQuestion.isFake ? "Questione: Isso parece realista ou exagerado?" : "Isso está alinhado com o conhecimento científico estabelecido.");
+            
+            const hintContent = document.getElementById('hint-content');
+            const hintSection = document.getElementById('hint-section');
+            const useHintBtn = document.getElementById('use-hint-btn');
+
+            if (hintContent) hintContent.textContent = hintText;
+            if (hintSection) hintSection.classList.remove('hidden');
+            if (useHintBtn) useHintBtn.style.display = 'none';
+
+            // 2. Lógica de Áudio (Só se acessibilidade estiver ativa)
             if (this.accessibilityMode) {
                 this.accessibilityManager.speak(this.getNewsNarrationText());
-            } else {
-                const hintText = this.currentQuestion.hint || (this.currentQuestion.isFake ? "Questione: Isso parece realista ou exagerado?" : "Isso está alinhado com o conhecimento científico estabelecido.");
-                document.getElementById('hint-content').textContent = hintText;
-                document.getElementById('hint-section').classList.remove('hidden');
-                document.getElementById('use-hint-btn').style.display = 'none';
             }
         }
     }
