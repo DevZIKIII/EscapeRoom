@@ -94,9 +94,35 @@ class AccessibilityManager {
         let nearest = null;
         let minDistance = Infinity;
         
-        const allItems = [...this.game.newsItems, ...this.game.powerUps];
+        // --- ETAPA 1: Priorizar Power-Ups ---
+        // Itera primeiro sobre os power-ups
+        this.game.powerUps.forEach(item => {
+            if (item.collected) return;
+            
+            const itemPixelX = (item.xPercent / 100) * this.game.canvas.offsetWidth;
+            const itemPixelY = (item.yPercent / 100) * this.game.canvas.offsetHeight;
+            
+            const distance = Math.sqrt(
+                Math.pow(this.game.player.x - itemPixelX, 2) +
+                Math.pow(this.game.player.y - itemPixelY, 2)
+            );
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearest = { x: itemPixelX, y: itemPixelY, distance: distance, item: item };
+            }
+        });
 
-        allItems.forEach(item => {
+        // Se um power-up foi encontrado, retorne-o imediatamente.
+        if (nearest) {
+            return nearest;
+        }
+
+        // --- ETAPA 2: Fallback para Notícias ---
+        // Somente se nenhum power-up foi encontrado, procure notícias.
+        minDistance = Infinity; // Resetar a distância para a nova busca
+
+        this.game.newsItems.forEach(item => {
             if (item.collected) return;
             
             const itemPixelX = (item.xPercent / 100) * this.game.canvas.offsetWidth;
@@ -113,7 +139,7 @@ class AccessibilityManager {
             }
         });
         
-        return nearest;
+        return nearest; // Retorna a notícia mais próxima (ou null se a sala estiver vazia)
     }
     
     getDoorLocation() {
